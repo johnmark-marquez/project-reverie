@@ -7,7 +7,7 @@ import type { NextConfig } from "next";
  * Set GITHUB_PAGES=true when building for deployment so basePath and
  * asset URLs resolve correctly on Pages. Local dev omits basePath.
  */
-const repo = "project-revierie";
+const repo = "project-reveirie";
 const isGithubPages = process.env.GITHUB_PAGES === "true";
 const basePath = isGithubPages ? `/${repo}` : "";
 
