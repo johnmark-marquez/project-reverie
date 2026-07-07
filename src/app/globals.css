@@ -49,8 +49,6 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -115,6 +113,20 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+:root {
+  --background: #faf8f5;
+  --foreground: #383838;
+
+  --rose: #e7a3a3;
+  --apricot: #f4c49a;
+  --buttercream: #f6e7a8;
+  --sage: #bfd8be;
+  --mist: #bfdff1;
+  --lavender: #d7c6f1;
+
+  --gold: #c8a97e;
 }
 
 @layer base {
