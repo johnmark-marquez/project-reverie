@@ -161,6 +161,20 @@
   }
 }
 
+@keyframes watercolor-opacity-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.watercolor-opacity-motion {
+  animation: watercolor-opacity-fade 20s ease-in-out infinite;
+}
+
 @keyframes watercolor-drift {
   0%,
   100% {
@@ -200,6 +214,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .watercolor-opacity-motion {
+    animation: none;
+  }
   html {
     scroll-behavior: auto;
   }

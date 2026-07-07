@@ -2,29 +2,29 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-export type WatercolorQuality = "full" | "reduced" | "minimal";
+export type RenderQuality = "high" | "medium" | "low";
 
-function getQuality(): WatercolorQuality {
+function getRenderQuality(): RenderQuality {
   if (typeof window === "undefined") {
-    return "reduced";
+    return "medium";
   }
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    return "minimal";
+    return "low";
   }
 
   if (window.matchMedia("(max-width: 640px)").matches) {
-    return "reduced";
+    return "low";
   }
 
   if (
     window.matchMedia("(max-width: 1024px)").matches ||
     window.matchMedia("(pointer: coarse)").matches
   ) {
-    return "reduced";
+    return "medium";
   }
 
-  return "full";
+  return "high";
 }
 
 function subscribe(onStoreChange: () => void) {
@@ -44,12 +44,12 @@ function subscribe(onStoreChange: () => void) {
   };
 }
 
-/** Downgrades expensive watercolor effects on phones and coarse-pointer devices. */
-export function useWatercolorQuality(): WatercolorQuality {
+/** Picks high / medium / low renderer tier for progressive enhancement. */
+export function useRenderQuality(): RenderQuality {
   const clientQuality = useSyncExternalStore(
     subscribe,
-    getQuality,
-    (): WatercolorQuality => "reduced",
+    getRenderQuality,
+    (): RenderQuality => "medium",
   );
   const [hydrated, setHydrated] = useState(false);
 
@@ -57,6 +57,5 @@ export function useWatercolorQuality(): WatercolorQuality {
     setHydrated(true);
   }, []);
 
-  // Match SSR/first paint, then apply device-specific quality after hydration.
-  return hydrated ? clientQuality : "reduced";
+  return hydrated ? clientQuality : "medium";
 }

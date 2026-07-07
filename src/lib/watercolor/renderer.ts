@@ -1,6 +1,6 @@
-import type { WatercolorQuality } from "@/hooks/use-watercolor-quality";
+import type { RenderQuality } from "@/hooks/useRenderQuality";
+import { opacityBoostForScene, washBlurCss } from "@/lib/watercolor/render-quality";
 import { resolveComposition } from "./composition";
-import { adaptWashMetrics } from "./wash-metrics";
 import { lightingOpacity, pigmentTone } from "./utils";
 import type {
   LightingPreset,
@@ -27,12 +27,12 @@ export interface RenderedWash {
 
 interface RenderOptions {
   lighting?: LightingPreset;
-  quality?: WatercolorQuality;
+  quality?: RenderQuality;
 }
 
 function expandPigment(
   wash: WatercolorWash,
-  quality: WatercolorQuality,
+  quality: RenderQuality,
 ): Array<{
   tone: PigmentTone;
   opacity: number;
@@ -45,7 +45,7 @@ function expandPigment(
       scale: layer.scale ?? 1,
     }));
 
-    if (quality !== "full") {
+    if (quality !== "high") {
       return [layers[Math.floor(layers.length / 2)] ?? layers[0]!];
     }
 
@@ -54,7 +54,7 @@ function expandPigment(
 
   const base = wash.opacity ?? 0.24;
 
-  if (quality !== "full") {
+  if (quality !== "high") {
     return [{ tone: "medium", opacity: base, scale: 1 }];
   }
 
@@ -70,16 +70,16 @@ export function renderScene(
   options: RenderOptions = {},
 ): RenderedWash[] {
   const lighting = options.lighting ?? scene.lighting ?? "morning";
-  const quality = options.quality ?? "full";
+  const quality = options.quality ?? "high";
   const preset = lightingPresets[lighting];
-  const opacityBoost = quality === "reduced" ? 0.95 : quality === "minimal" ? 1.05 : 1;
+  const opacityBoost = opacityBoostForScene(scene, quality);
   const rendered: RenderedWash[] = [];
 
   scene.washes.forEach((wash, washIndex) => {
     const position = resolveComposition(wash.composition);
     const yPercent = parseFloat(position.top);
     const lightMod = lightingOpacity(yPercent, preset.direction);
-    const metrics = adaptWashMetrics(wash.size, wash.blur, quality);
+    const sizeScale = quality === "medium" ? 0.78 : 1;
 
     expandPigment(wash, quality).forEach((layer, layerIndex) => {
       rendered.push({
@@ -88,9 +88,9 @@ export function renderScene(
         color: pigmentTone(wash.color, layer.tone),
         left: position.left,
         top: position.top,
-        size: metrics.size,
-        blur: metrics.blur,
-        opacity: layer.opacity * lightMod * opacityBoost,
+        size: Math.round(wash.size * sizeScale),
+        blur: wash.blur,
+        opacity: Math.min(0.55, layer.opacity * lightMod * opacityBoost),
         rotation: position.rotation,
         scale: position.scale * layer.scale,
         depth: position.depth + layerIndex * 0.1,
@@ -98,5 +98,8 @@ export function renderScene(
     });
   });
 
-  return rendered;
+  return rendered.map((wash) => ({
+    ...wash,
+    blur: washBlurCss(wash.blur, quality),
+  }));
 }

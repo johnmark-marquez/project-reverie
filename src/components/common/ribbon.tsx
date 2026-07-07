@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { useWatercolorQuality } from "@/hooks/use-watercolor-quality";
+import { useRenderQuality } from "@/hooks/useRenderQuality";
 import { palette } from "@/lib/watercolor/palette";
 import { rainbow } from "@/lib/watercolor/themes";
 import { cn } from "@/lib/utils";
@@ -13,8 +13,8 @@ interface RibbonProps {
 
 export function Ribbon({ className, variant = "painted" }: RibbonProps) {
   const id = useId().replace(/:/g, "");
-  const quality = useWatercolorQuality();
-  const usePaintFilter = quality === "full";
+  const quality = useRenderQuality();
+  const usePaintFilter = quality === "high";
 
   if (variant === "straight") {
     return (

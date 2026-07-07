@@ -1,32 +1,12 @@
 import type { RenderedWash } from "@/lib/watercolor/renderer";
-import type { WatercolorQuality } from "@/hooks/use-watercolor-quality";
 import { WatercolorShape } from "./watercolorShape";
 
 interface Props {
   wash: RenderedWash;
   useFilter?: boolean;
-  quality?: WatercolorQuality;
 }
 
-function washBlur(blur: number, quality: WatercolorQuality) {
-  if (quality === "minimal") {
-    return Math.min(32, Math.round(blur * 0.5));
-  }
-
-  if (quality === "reduced") {
-    return Math.min(42, Math.round(blur * 0.55));
-  }
-
-  return Math.max(10, Math.round(blur * 0.4));
-}
-
-export function WatercolorLayer({
-  wash,
-  useFilter = true,
-  quality = "full",
-}: Props) {
-  const cssBlur = washBlur(wash.blur, quality);
-
+export function WatercolorLayer({ wash, useFilter = false }: Props) {
   return (
     <div
       className="absolute watercolor-wash"
@@ -37,7 +17,7 @@ export function WatercolorLayer({
         height: wash.size,
         opacity: wash.opacity,
         zIndex: Math.round(wash.depth * 10) + 1,
-        filter: `blur(${cssBlur}px)`,
+        filter: `blur(${wash.blur}px)`,
         mixBlendMode: "multiply",
         transform: `
           translate(-50%, -50%)

@@ -8,9 +8,12 @@ import {
   heroScene,
 } from "@/components/effects/watercolor";
 import { Heading, Text } from "@/components/ui/typography";
+import { useRenderQuality } from "@/hooks/useRenderQuality";
 import { siteConfig } from "@/config/site";
 
 export function Hero() {
+  const quality = useRenderQuality();
+
   return (
     <WatercolorCanvas
       scene={heroScene}
@@ -18,10 +21,12 @@ export function Hero() {
       animated
     >
       <div className="relative flex min-h-screen flex-col items-center px-6 pt-28 pb-12 text-center md:pt-28">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-16 bottom-0 bg-[radial-gradient(ellipse_at_center,rgba(250,248,245,0.92)_0%,rgba(250,248,245,0.55)_45%,transparent_78%)] md:hidden"
-        />
+        {quality === "low" ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-16 bottom-0 bg-[radial-gradient(ellipse_at_center,rgba(250,248,245,0.68)_0%,rgba(250,248,245,0.22)_50%,transparent_84%)]"
+          />
+        ) : null}
         <FadeIn className="relative flex w-full max-w-2xl flex-col items-center">
           <Ribbon className="mb-5 w-28 md:w-36" />
           <Text variant="caption" className="mb-3 tracking-[0.2em] uppercase">
