@@ -194,8 +194,6 @@
 }
 
 @media (max-width: 768px), (pointer: coarse) {
-  .watercolor-drift,
-  .watercolor-motion,
   .watercolor-motion .watercolor-wash {
     animation: none !important;
   }

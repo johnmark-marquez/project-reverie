@@ -14,7 +14,7 @@ function getQuality(): WatercolorQuality {
   }
 
   if (window.matchMedia("(max-width: 640px)").matches) {
-    return "minimal";
+    return "reduced";
   }
 
   if (

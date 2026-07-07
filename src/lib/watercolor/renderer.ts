@@ -71,6 +71,7 @@ export function renderScene(
   const lighting = options.lighting ?? scene.lighting ?? "morning";
   const quality = options.quality ?? "full";
   const preset = lightingPresets[lighting];
+  const opacityBoost = quality === "reduced" ? 1.2 : quality === "minimal" ? 1.35 : 1;
   const rendered: RenderedWash[] = [];
 
   scene.washes.forEach((wash, washIndex) => {
@@ -87,7 +88,7 @@ export function renderScene(
         top: position.top,
         size: wash.size,
         blur: wash.blur,
-        opacity: layer.opacity * lightMod,
+        opacity: layer.opacity * lightMod * opacityBoost,
         rotation: position.rotation,
         scale: position.scale * layer.scale,
         depth: position.depth + layerIndex * 0.1,

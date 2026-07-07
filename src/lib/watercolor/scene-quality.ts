@@ -3,9 +3,24 @@ import type { WatercolorQuality } from "@/hooks/use-watercolor-quality";
 
 const WASH_LIMITS: Record<WatercolorQuality, number | null> = {
   full: null,
-  reduced: 6,
-  minimal: 3,
+  reduced: 8,
+  minimal: 4,
 };
+
+function pickSpreadWashes<T>(items: T[], limit: number): T[] {
+  if (items.length <= limit) {
+    return items;
+  }
+
+  if (limit <= 1) {
+    return [items[0]!];
+  }
+
+  return Array.from({ length: limit }, (_, index) => {
+    const sourceIndex = Math.round((index / (limit - 1)) * (items.length - 1));
+    return items[sourceIndex]!;
+  });
+}
 
 export function sceneForQuality(
   scene: WatercolorScene,
@@ -19,7 +34,7 @@ export function sceneForQuality(
 
   return {
     ...scene,
-    motion: false,
-    washes: scene.washes.slice(0, limit),
+    motion: quality !== "minimal" && scene.motion,
+    washes: pickSpreadWashes(scene.washes, limit),
   };
 }

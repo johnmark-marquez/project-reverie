@@ -10,11 +10,11 @@ interface Props {
 
 function washBlur(blur: number, quality: WatercolorQuality) {
   if (quality === "minimal") {
-    return Math.min(6, Math.round(blur * 0.2));
+    return Math.min(10, Math.round(blur * 0.28));
   }
 
   if (quality === "reduced") {
-    return Math.min(12, Math.round(blur * 0.3));
+    return Math.min(18, Math.round(blur * 0.38));
   }
 
   return Math.max(10, Math.round(blur * 0.4));
@@ -38,7 +38,7 @@ export function WatercolorLayer({
         opacity: wash.opacity,
         zIndex: Math.round(wash.depth * 10) + 1,
         filter: `blur(${cssBlur}px)`,
-        mixBlendMode: quality === "full" ? "multiply" : "normal",
+        mixBlendMode: "multiply",
         transform: `
           translate(-50%, -50%)
           rotate(${wash.rotation}deg)

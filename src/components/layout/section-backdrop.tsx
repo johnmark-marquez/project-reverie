@@ -33,7 +33,6 @@ function PaperOnlyBackdrop() {
  * Defers heavy canvases until near the viewport and downgrades on phones.
  */
 export function SectionBackdrop({ preset }: SectionBackdropProps) {
-  const quality = useWatercolorQuality();
   const ref = useRef<HTMLDivElement>(null);
   const [isNearViewport, setIsNearViewport] = useState(false);
 
@@ -54,7 +53,7 @@ export function SectionBackdrop({ preset }: SectionBackdropProps) {
     return () => observer.disconnect();
   }, []);
 
-  if (preset === "minimal" || preset === "hero" || quality === "minimal") {
+  if (preset === "minimal" || preset === "hero") {
     return <PaperOnlyBackdrop />;
   }
 

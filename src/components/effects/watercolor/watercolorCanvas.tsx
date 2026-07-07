@@ -42,13 +42,13 @@ export function WatercolorCanvas({
   const texturePreset = texture ?? adaptedScene.texture ?? "cotton";
   const lightingPreset = lighting ?? adaptedScene.lighting ?? "morning";
   const motionEnabled =
-    quality === "full" && (animated ?? adaptedScene.motion ?? false);
+    quality !== "minimal" && (animated ?? adaptedScene.motion ?? false);
   const washes = renderScene(adaptedScene, {
     lighting: lightingPreset,
     quality,
   });
   const useSvgFilters = quality === "full";
-  const usePaperTexture = quality !== "minimal";
+  const usePaperTexture = true;
 
   return (
     <div
