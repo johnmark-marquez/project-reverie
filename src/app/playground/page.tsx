@@ -1,0 +1,34 @@
+import { heroScene, storyScene, WatercolorCanvas } from "@/components/effects/watercolor";
+
+const scenes = [
+  { label: "Hero", scene: heroScene },
+  { label: "Story", scene: storyScene },
+] as const;
+
+export default function PlaygroundPage() {
+  if (process.env.NODE_ENV === "production") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground">Playground is only available in development.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-ivory">
+      <header className="border-b border-border px-6 py-4">
+        <h1 className="text-h2">Watercolor Playground</h1>
+        <p className="text-caption">Scene tester — development only</p>
+      </header>
+
+      {scenes.map(({ label, scene }) => (
+        <div key={scene.name} className="border-b border-border">
+          <p className="px-6 py-3 text-sm font-medium text-muted-foreground">
+            {label} ({scene.name})
+          </p>
+          <WatercolorCanvas scene={scene} className="h-[60vh]" animate={scene.name === "hero"} />
+        </div>
+      ))}
+    </div>
+  );
+}
