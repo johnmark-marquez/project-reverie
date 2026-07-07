@@ -9,13 +9,18 @@ export function isValidGuestCode(code: string): boolean {
   return GUEST_CODE_PATTERN.test(normalizeGuestCode(code));
 }
 
-/** Build an RSVP path with optional GitHub Pages basePath. */
+/** App-relative path for Next.js Link / router (basePath is added automatically). */
 export function rsvpPath(guestCode?: string): string {
-  const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   if (!guestCode) {
-    return `${base}/rsvp/`;
+    return "/rsvp/";
   }
 
   const normalized = encodeURIComponent(normalizeGuestCode(guestCode));
-  return `${base}/rsvp/${normalized}/`;
+  return `/rsvp/${normalized}/`;
+}
+
+/** Full path with GitHub Pages basePath — for QR codes, emails, or external links. */
+export function rsvpPublicPath(guestCode?: string): string {
+  const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  return `${base}${rsvpPath(guestCode)}`;
 }
