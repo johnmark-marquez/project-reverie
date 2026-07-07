@@ -33,25 +33,25 @@ export function SiteShell({ children }: SiteShellProps) {
         Skip to content
       </a>
 
-      <header className="fixed top-0 right-0 left-0 z-50 border-b border-border/40 bg-ivory/80 backdrop-blur-md">
+      <header className="fixed top-0 right-0 left-0 z-50 border-b border-border/40 bg-ivory/90 backdrop-blur-md">
         <nav
           aria-label="Main navigation"
-          className="mx-auto flex max-w-5xl flex-col gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between"
+          className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4"
         >
           <Link
             href="/"
-            className="font-heading text-lg tracking-wide text-ink transition-colors hover:text-gold"
+            className="font-heading hidden text-lg tracking-wide text-ink transition-colors hover:text-gold sm:block"
           >
             {siteConfig.title}
           </Link>
 
-          <ul className="flex items-center gap-4 overflow-x-auto md:gap-6">
+          <ul className="flex w-full items-center justify-between gap-3 overflow-x-auto sm:w-auto sm:justify-end sm:gap-6">
             {navLinks.map((link) => (
               <li key={link.href} className="shrink-0">
                 <a
                   href={link.href}
                   className={cn(
-                    "text-sm text-muted-foreground transition-colors",
+                    "text-xs whitespace-nowrap text-muted-foreground transition-colors sm:text-sm",
                     "hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   )}
                 >

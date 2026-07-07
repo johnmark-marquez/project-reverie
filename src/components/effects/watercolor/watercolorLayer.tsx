@@ -10,11 +10,11 @@ interface Props {
 
 function washBlur(blur: number, quality: WatercolorQuality) {
   if (quality === "minimal") {
-    return Math.min(10, Math.round(blur * 0.28));
+    return Math.min(32, Math.round(blur * 0.5));
   }
 
   if (quality === "reduced") {
-    return Math.min(18, Math.round(blur * 0.38));
+    return Math.min(42, Math.round(blur * 0.55));
   }
 
   return Math.max(10, Math.round(blur * 0.4));

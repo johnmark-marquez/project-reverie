@@ -1,5 +1,6 @@
 import type { WatercolorQuality } from "@/hooks/use-watercolor-quality";
 import { resolveComposition } from "./composition";
+import { adaptWashMetrics } from "./wash-metrics";
 import { lightingOpacity, pigmentTone } from "./utils";
 import type {
   LightingPreset,
@@ -71,13 +72,14 @@ export function renderScene(
   const lighting = options.lighting ?? scene.lighting ?? "morning";
   const quality = options.quality ?? "full";
   const preset = lightingPresets[lighting];
-  const opacityBoost = quality === "reduced" ? 1.2 : quality === "minimal" ? 1.35 : 1;
+  const opacityBoost = quality === "reduced" ? 0.95 : quality === "minimal" ? 1.05 : 1;
   const rendered: RenderedWash[] = [];
 
   scene.washes.forEach((wash, washIndex) => {
     const position = resolveComposition(wash.composition);
     const yPercent = parseFloat(position.top);
     const lightMod = lightingOpacity(yPercent, preset.direction);
+    const metrics = adaptWashMetrics(wash.size, wash.blur, quality);
 
     expandPigment(wash, quality).forEach((layer, layerIndex) => {
       rendered.push({
@@ -86,8 +88,8 @@ export function renderScene(
         color: pigmentTone(wash.color, layer.tone),
         left: position.left,
         top: position.top,
-        size: wash.size,
-        blur: wash.blur,
+        size: metrics.size,
+        blur: metrics.blur,
         opacity: layer.opacity * lightMod * opacityBoost,
         rotation: position.rotation,
         scale: position.scale * layer.scale,

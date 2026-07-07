@@ -1,9 +1,10 @@
 import type { WatercolorScene } from "@/components/effects/watercolor/types";
 import type { WatercolorQuality } from "@/hooks/use-watercolor-quality";
+import { adaptCompositionForQuality } from "./wash-metrics";
 
 const WASH_LIMITS: Record<WatercolorQuality, number | null> = {
   full: null,
-  reduced: 8,
+  reduced: 6,
   minimal: 4,
 };
 
@@ -35,6 +36,9 @@ export function sceneForQuality(
   return {
     ...scene,
     motion: quality !== "minimal" && scene.motion,
-    washes: pickSpreadWashes(scene.washes, limit),
+    washes: pickSpreadWashes(scene.washes, limit).map((wash) => ({
+      ...wash,
+      composition: adaptCompositionForQuality(wash.composition, quality),
+    })),
   };
 }
