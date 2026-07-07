@@ -1,6 +1,11 @@
 import type { PaletteColor } from "@/lib/watercolor/palette";
 import { palette } from "@/lib/watercolor/palette";
 import { createSeededRandom, hashString } from "@/lib/watercolor/seeded-random";
+import {
+  getCachedWash,
+  setCachedWash,
+  washCacheKey,
+} from "@/lib/watercolor/wash-cache";
 
 export type WashIntensity = "bold" | "soft" | "whisper";
 
@@ -162,15 +167,36 @@ export function paintOrganicWash(
   const imageData = ctx.createImageData(width, height);
   const data = imageData.data;
 
+  const noiseBuckets = 384;
+  const topNoiseLUT = new Float32Array(noiseBuckets);
+  const bottomNoiseLUT = new Float32Array(noiseBuckets);
+  const bleedNoiseLUT = new Float32Array(noiseBuckets);
+
+  for (let index = 0; index < noiseBuckets; index += 1) {
+    const nx = index / (noiseBuckets - 1);
+    topNoiseLUT[index] =
+      fbm(nx * 4.2, noiseSeed, 5) * 0.62 +
+      fbm(nx * 9.5, noiseSeed + 17, 3) * 0.38;
+    bottomNoiseLUT[index] =
+      fbm(nx * 3.8 + 1.7, noiseSeed + 53, 5) * 0.64 +
+      fbm(nx * 8.1, noiseSeed + 71, 3) * 0.36;
+    bleedNoiseLUT[index] = fbm(nx * 2.4, noiseSeed + 240, 2) * 0.08;
+  }
+
+  const sampleNoise = (table: Float32Array, nx: number) => {
+    const index = Math.min(
+      noiseBuckets - 1,
+      Math.max(0, Math.round(nx * (noiseBuckets - 1))),
+    );
+    return table[index]!;
+  };
+
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const rotatedX = (x - width / 2) * cos - (y - centerY) * sin + width / 2;
       const nx = rotatedX / width;
-      const topNoise =
-        fbm(nx * 4.2, noiseSeed, 5) * 0.62 + fbm(nx * 9.5, noiseSeed + 17, 3) * 0.38;
-      const bottomNoise =
-        fbm(nx * 3.8 + 1.7, noiseSeed + 53, 5) * 0.64 +
-        fbm(nx * 8.1, noiseSeed + 71, 3) * 0.36;
+      const topNoise = sampleNoise(topNoiseLUT, nx);
+      const bottomNoise = sampleNoise(bottomNoiseLUT, nx);
       const topEdge = centerY - bandHalf + topNoise * bandHalf * 0.72;
       const bottomEdge = centerY + bandHalf - bottomNoise * bandHalf * 0.68;
       const mid = (topEdge + bottomEdge) / 2;
@@ -187,9 +213,9 @@ export function paintOrganicWash(
           y < topEdge ? topEdge - y : y > bottomEdge ? y - bottomEdge : 0;
         const tendrilNoise = fbm(nx * 11 + y * 0.04, noiseSeed + 190, 2);
 
-        if (outside < bandHalf * 0.42 * config.tendrils && tendrilNoise > 0.42) {
+        if (outside < halfBand * 0.42 * config.tendrils && tendrilNoise > 0.42) {
           alpha =
-            (1 - outside / (bandHalf * 0.42)) *
+            (1 - outside / (halfBand * 0.42)) *
             (tendrilNoise - 0.42) *
             2.4 *
             config.alpha *
@@ -201,7 +227,7 @@ export function paintOrganicWash(
         continue;
       }
 
-      const bleed = fbm(nx * 2.4, noiseSeed + 240, 2) * 0.08;
+      const bleed = sampleNoise(bleedNoiseLUT, nx);
       const pigment = colorAt(colors, Math.min(1, Math.max(0, nx + bleed)));
       const idx = (y * width + x) * 4;
 
@@ -267,9 +293,22 @@ export function renderOrganicWashToCanvas(
 
   const targetWidth = Math.max(1, Math.round(options.width));
   const targetHeight = Math.max(1, Math.round(options.height));
+  const renderOptions = {
+    ...options,
+    width: targetWidth,
+    height: targetHeight,
+  };
+  const key = washCacheKey(renderOptions);
+  const cached = getCachedWash(key);
 
   canvas.width = targetWidth;
   canvas.height = targetHeight;
+
+  if (cached) {
+    context.clearRect(0, 0, targetWidth, targetHeight);
+    context.drawImage(cached, 0, 0);
+    return;
+  }
 
   const scratch = document.createElement("canvas");
   scratch.width = targetWidth;
@@ -281,11 +320,8 @@ export function renderOrganicWashToCanvas(
     return;
   }
 
-  paintOrganicWash(scratchContext, {
-    ...options,
-    width: targetWidth,
-    height: targetHeight,
-  });
+  paintOrganicWash(scratchContext, renderOptions);
+  setCachedWash(key, scratch);
 
   context.clearRect(0, 0, targetWidth, targetHeight);
   context.filter = "blur(0.6px)";

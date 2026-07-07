@@ -26,7 +26,7 @@ export function HighQualityCanvas({
       style={{ backgroundColor: palette[scene.background] }}
     >
       <Motion enabled={motionEnabled}>
-        <OrganicWash scene={scene} animated={motionEnabled} />
+        <OrganicWash scene={scene} animated={motionEnabled} priority="high" />
       </Motion>
 
       <PaperTexture preset={texturePreset} />

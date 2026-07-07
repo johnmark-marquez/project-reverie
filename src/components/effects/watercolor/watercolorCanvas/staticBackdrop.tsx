@@ -18,7 +18,7 @@ export function StaticBackdrop({ scene, className = "" }: StaticBackdropProps) {
       className={`pointer-events-none absolute inset-0 -z-10 ${className}`}
       style={{ backgroundColor: palette[scene.background] }}
     >
-      <OrganicWash scene={scene} />
+      <OrganicWash scene={scene} priority="low" />
       <PaperTexture preset={scene.texture ?? "cotton"} lite />
     </div>
   );

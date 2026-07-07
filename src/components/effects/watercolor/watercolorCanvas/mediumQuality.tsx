@@ -24,7 +24,7 @@ export function MediumQualityCanvas({
       className={`relative overflow-hidden ${className}`}
       style={{ backgroundColor: palette[scene.background] }}
     >
-      <OrganicWash scene={scene} animated={motionEnabled} />
+      <OrganicWash scene={scene} animated={motionEnabled} priority="high" />
       <PaperTexture preset={texturePreset} lite />
       <Lighting preset={lightingPreset} />
       <div className="relative z-10">{children}</div>
