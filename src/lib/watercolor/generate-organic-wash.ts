@@ -39,9 +39,9 @@ const INTENSITY: Record<
   WashIntensity,
   { bandHeight: number; alpha: number; splatters: number; tendrils: number }
 > = {
-  bold: { bandHeight: 0.66, alpha: 1, splatters: 220, tendrils: 1.15 },
-  soft: { bandHeight: 0.54, alpha: 0.84, splatters: 110, tendrils: 0.95 },
-  whisper: { bandHeight: 0.4, alpha: 0.58, splatters: 50, tendrils: 0.72 },
+  bold: { bandHeight: 0.62, alpha: 1, splatters: 78, tendrils: 1.15 },
+  soft: { bandHeight: 0.54, alpha: 0.84, splatters: 48, tendrils: 0.95 },
+  whisper: { bandHeight: 0.4, alpha: 0.58, splatters: 22, tendrils: 0.72 },
 };
 
 function hexToRgb(hex: string) {
@@ -130,17 +130,205 @@ export function washOptionsForScene(
   width: number,
   height: number,
   washOpacity?: number,
+  verticalCenterOverride?: number,
 ): OrganicWashOptions {
   const rng = createSeededRandom(hashString(sceneId));
+  const defaultCenter =
+    sceneId === "hero" ? 0.36 : rng.range(0.4, 0.56);
 
   return {
     width,
     height,
     seed: sceneId,
     intensity: intensityForSceneId(sceneId, washOpacity),
-    verticalCenter: rng.range(0.4, 0.56),
+    verticalCenter: verticalCenterOverride ?? defaultCenter,
     tilt: rng.range(-3.5, 3.5),
   };
+}
+
+function rgba(color: { r: number; g: number; b: number }, alpha: number) {
+  return `rgba(${color.r},${color.g},${color.b},${alpha})`;
+}
+
+/** Soft pools, edge rings, and sharp flecks — visible pigment texture. */
+function drawPigmentBlooms(
+  ctx: CanvasRenderingContext2D,
+  rng: ReturnType<typeof createSeededRandom>,
+  colors: ReturnType<typeof hexToRgb>[],
+  count: number,
+  width: number,
+  height: number,
+  centerY: number,
+  bandHalf: number,
+) {
+  const blooms = document.createElement("canvas");
+  blooms.width = width;
+  blooms.height = height;
+
+  const splatters = document.createElement("canvas");
+  splatters.width = width;
+  splatters.height = height;
+
+  const bloomContext = blooms.getContext("2d");
+  const splatterContext = splatters.getContext("2d");
+
+  if (!bloomContext || !splatterContext) {
+    return;
+  }
+
+  const bloomCount = Math.round(count * 0.58);
+  const ringCount = Math.max(8, Math.round(count * 0.14));
+  const fleckCount = Math.max(12, count - bloomCount - ringCount);
+
+  const pickColor = (x: number) =>
+    saturate(colorAt(colors, Math.min(1, Math.max(0, x / width))), 1.18);
+
+  for (let index = 0; index < bloomCount; index += 1) {
+    const x = rng.range(-width * 0.06, width * 1.06);
+    const y = centerY + rng.range(-bandHalf * 1.35, bandHalf * 1.35);
+    const radiusX = rng.range(36, 128);
+    const radiusY = radiusX * rng.range(0.42, 0.9);
+    const color = pickColor(x);
+    const peak = rng.range(0.16, 0.38);
+
+    bloomContext.save();
+    bloomContext.translate(x, y);
+    bloomContext.rotate(rng.range(0, Math.PI));
+    bloomContext.scale(1, radiusY / radiusX);
+
+    const gradient = bloomContext.createRadialGradient(
+      0,
+      0,
+      0,
+      0,
+      0,
+      radiusX,
+    );
+    gradient.addColorStop(0, rgba(color, peak));
+    gradient.addColorStop(0.42, rgba(color, peak * 0.55));
+    gradient.addColorStop(0.78, rgba(color, peak * 0.16));
+    gradient.addColorStop(1, rgba(color, 0));
+
+    bloomContext.fillStyle = gradient;
+    bloomContext.beginPath();
+    bloomContext.arc(0, 0, radiusX, 0, Math.PI * 2);
+    bloomContext.fill();
+    bloomContext.restore();
+  }
+
+  for (let index = 0; index < ringCount; index += 1) {
+    const x = rng.range(width * 0.04, width * 0.96);
+    const y = centerY + rng.range(-bandHalf * 1.1, bandHalf * 1.1);
+    const radius = rng.range(48, 118);
+    const color = pickColor(x);
+    const edge = rng.range(0.22, 0.34);
+
+    bloomContext.save();
+    bloomContext.translate(x, y);
+    bloomContext.scale(1, rng.range(0.55, 0.92));
+
+    const gradient = bloomContext.createRadialGradient(0, 0, 0, 0, 0, radius);
+    gradient.addColorStop(0, rgba(color, 0));
+    gradient.addColorStop(edge, rgba(color, 0));
+    gradient.addColorStop(edge + 0.1, rgba(color, rng.range(0.28, 0.48)));
+    gradient.addColorStop(edge + 0.22, rgba(color, rng.range(0.1, 0.22)));
+    gradient.addColorStop(1, rgba(color, 0));
+
+    bloomContext.fillStyle = gradient;
+    bloomContext.beginPath();
+    bloomContext.arc(0, 0, radius, 0, Math.PI * 2);
+    bloomContext.fill();
+    bloomContext.restore();
+  }
+
+  for (let index = 0; index < fleckCount; index += 1) {
+    const x = rng.range(0, width);
+    const y = centerY + rng.range(-bandHalf * 1.25, bandHalf * 1.25);
+    const radius = rng.range(4, 18);
+    const stretch = rng.range(0.45, 1);
+    const color = pickColor(x);
+    const peak = rng.range(0.32, 0.68);
+
+    splatterContext.save();
+    splatterContext.translate(x, y);
+    splatterContext.rotate(rng.range(0, Math.PI));
+    splatterContext.scale(1, stretch);
+
+    const gradient = splatterContext.createRadialGradient(
+      0,
+      0,
+      0,
+      0,
+      0,
+      radius,
+    );
+    gradient.addColorStop(0, rgba(color, peak));
+    gradient.addColorStop(0.55, rgba(color, peak * 0.42));
+    gradient.addColorStop(1, rgba(color, 0));
+
+    splatterContext.fillStyle = gradient;
+    splatterContext.beginPath();
+    splatterContext.arc(0, 0, radius, 0, Math.PI * 2);
+    splatterContext.fill();
+    splatterContext.restore();
+
+    const satellites = rng.int(3);
+
+    for (let satellite = 0; satellite < satellites; satellite += 1) {
+      const angle = rng.range(0, Math.PI * 2);
+      const distance = radius * rng.range(1.4, 2.8);
+      const satelliteRadius = rng.range(1.5, 5);
+      const satelliteColor = pickColor(x + Math.cos(angle) * distance);
+
+      splatterContext.fillStyle = rgba(
+        satelliteColor,
+        rng.range(0.22, 0.52),
+      );
+      splatterContext.beginPath();
+      splatterContext.arc(
+        x + Math.cos(angle) * distance,
+        y + Math.sin(angle) * distance,
+        satelliteRadius,
+        0,
+        Math.PI * 2,
+      );
+      splatterContext.fill();
+    }
+  }
+
+  for (let index = 0; index < Math.max(4, Math.round(count * 0.08)); index += 1) {
+    const x = rng.range(0, width);
+    const y = centerY + rng.range(-bandHalf, bandHalf);
+    const radius = rng.range(24, 52);
+
+    bloomContext.save();
+    bloomContext.translate(x, y);
+    bloomContext.scale(1, rng.range(0.55, 0.88));
+
+    const gradient = bloomContext.createRadialGradient(0, 0, 0, 0, 0, radius);
+    gradient.addColorStop(0, `rgba(255,255,255,${rng.range(0.12, 0.28)})`);
+    gradient.addColorStop(0.55, `rgba(255,255,255,${rng.range(0.04, 0.1)})`);
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+    bloomContext.fillStyle = gradient;
+    bloomContext.beginPath();
+    bloomContext.arc(0, 0, radius, 0, Math.PI * 2);
+    bloomContext.fill();
+    bloomContext.restore();
+  }
+
+  ctx.save();
+  ctx.filter = "blur(4px)";
+  ctx.globalCompositeOperation = "multiply";
+  ctx.globalAlpha = 0.92;
+  ctx.drawImage(blooms, 0, 0);
+  ctx.filter = "blur(0.8px)";
+  ctx.globalAlpha = 0.88;
+  ctx.drawImage(splatters, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.filter = "none";
+  ctx.globalCompositeOperation = "source-over";
+  ctx.restore();
 }
 
 export function paintOrganicWash(
@@ -241,44 +429,16 @@ export function paintOrganicWash(
   ctx.clearRect(0, 0, width, height);
   ctx.putImageData(imageData, 0, 0);
 
-  ctx.globalCompositeOperation = "source-over";
-
-  for (let index = 0; index < config.splatters; index += 1) {
-    const x = rng.range(0, width);
-    const y = centerY + rng.range(-bandHalf * 1.55, bandHalf * 1.55);
-    const radius = rng.range(0.4, 5.2);
-    const bleach = rng.next() > 0.72;
-
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-
-    if (bleach) {
-      ctx.fillStyle = `rgba(255,255,255,${rng.range(0.12, 0.45)})`;
-    } else {
-      const color = saturate(colors[rng.int(colors.length)]!, 1.22);
-      ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${rng.range(0.22, 0.58)})`;
-    }
-
-    ctx.fill();
-  }
-
-  for (let index = 0; index < config.splatters * 0.35; index += 1) {
-    const x = rng.range(-width * 0.02, width * 1.02);
-    const edge = rng.next() > 0.5 ? -1 : 1;
-    const y =
-      centerY +
-      edge * bandHalf * rng.range(0.85, 1.35) +
-      rng.range(-18, 18);
-    const radius = rng.range(0.2, 2.4);
-    const color = saturate(colors[rng.int(colors.length)]!, 1.22);
-
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${rng.range(0.14, 0.38)})`;
-    ctx.fill();
-  }
-
-  ctx.globalCompositeOperation = "source-over";
+  drawPigmentBlooms(
+    ctx,
+    rng,
+    colors,
+    config.splatters,
+    width,
+    height,
+    centerY,
+    bandHalf,
+  );
 }
 
 export function renderOrganicWashToCanvas(
@@ -298,7 +458,10 @@ export function renderOrganicWashToCanvas(
     width: targetWidth,
     height: targetHeight,
   };
-  const key = washCacheKey(renderOptions);
+  const key = washCacheKey({
+    ...renderOptions,
+    verticalCenter: renderOptions.verticalCenter,
+  });
   const cached = getCachedWash(key);
 
   canvas.width = targetWidth;

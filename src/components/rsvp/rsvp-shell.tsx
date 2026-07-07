@@ -16,18 +16,18 @@ export function RsvpShell({ children }: RsvpShellProps) {
       <SectionBackdrop preset="rsvp" />
       <PaperTexture preset="cotton" lite />
 
-      <header className="relative z-10 border-b border-border/40 bg-ivory/90 backdrop-blur-md">
-        <Container className="py-4">
-          <div className="flex items-center justify-between gap-4">
+      <header className="relative z-10 border-b border-border/40 bg-ivory/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+        <Container className="py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href="/"
-              className="font-heading text-lg tracking-wide text-ink transition-colors hover:text-gold"
+              className="font-heading text-base tracking-wide text-ink transition-colors hover:text-gold sm:text-lg"
             >
               {siteConfig.title}
             </Link>
             <Link
               href="/"
-              className="text-sm text-muted-foreground transition-colors hover:text-ink"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-ink"
             >
               Back to site
             </Link>
@@ -38,7 +38,7 @@ export function RsvpShell({ children }: RsvpShellProps) {
 
       <main className="relative z-10 py-10 sm:py-14">{children}</main>
 
-      <footer className="relative z-10 border-t border-border/40 bg-ivory/80 py-8 backdrop-blur-sm">
+      <footer className="relative z-10 border-t border-border/40 bg-ivory/80 py-8 pb-[calc(2rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
         <Container className="text-center">
           <Text variant="caption" className="text-muted-foreground">
             {siteConfig.title} · {siteConfig.wedding.dateFormatted}

@@ -5,7 +5,7 @@ const MAX_CACHE_ENTRIES = 16;
 
 export function washCacheKey(options: OrganicWashOptions) {
   const { width, height, seed, intensity, verticalCenter, tilt } = options;
-  return `${seed}:${width}x${height}:${intensity}:${verticalCenter?.toFixed(3)}:${tilt?.toFixed(2)}`;
+  return `v3:${seed}:${width}x${height}:${intensity}:${verticalCenter?.toFixed(3)}:${tilt?.toFixed(2)}`;
 }
 
 export function getCachedWash(key: string) {

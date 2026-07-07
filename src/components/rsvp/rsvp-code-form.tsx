@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const inputClassName =
-  "w-full rounded-lg border border-border/60 bg-background px-3 py-2.5 font-mono text-sm tracking-wide text-ink uppercase outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-gold/60 focus:ring-2 focus:ring-gold/20";
+  "w-full rounded-lg border border-border/60 bg-background px-3 py-2.5 font-mono text-base tracking-wide text-ink uppercase outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-gold/60 focus:ring-2 focus:ring-gold/20 sm:text-sm";
 
 interface RsvpCodeFormProps {
   idPrefix?: string;

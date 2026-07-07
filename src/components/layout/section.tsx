@@ -17,7 +17,7 @@ export function Section({
     <section
       id={id}
       aria-labelledby={ariaLabelledby}
-      className={cn("py-20 md:py-28", className)}
+      className={cn("py-16 md:py-28", className)}
     >
       {children}
     </section>

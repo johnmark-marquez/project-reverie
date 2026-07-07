@@ -38,7 +38,7 @@ export function PrenupGallery() {
         </Text>
       </FadeIn>
 
-      <div className="grid gap-4 md:grid-cols-3 md:grid-rows-2">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-3 md:grid-rows-2">
         {featured ? (
           <FadeIn delay={0.1} className="md:col-span-2 md:row-span-2">
             <PrenupPhoto

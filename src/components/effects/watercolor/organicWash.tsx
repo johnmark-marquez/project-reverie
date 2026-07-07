@@ -6,6 +6,11 @@ import {
   renderOrganicWashToCanvas,
   washOptionsForScene,
 } from "@/lib/watercolor/generate-organic-wash";
+import {
+  isMobileViewport,
+  washLazyRootMargin,
+  washPixelBudget,
+} from "@/lib/watercolor/mobile-budget";
 import { scheduleWashPaint } from "@/lib/watercolor/wash-paint-queue";
 
 interface OrganicWashProps {
@@ -14,6 +19,8 @@ interface OrganicWashProps {
   animated?: boolean;
   /** Hero paints immediately; section backdrops wait until near the viewport. */
   priority?: "high" | "low";
+  /** Override wash vertical position (0–1). Hero uses ~0.36 to sit behind names. */
+  verticalCenter?: number;
 }
 
 function averageWashOpacity(scene: WatercolorScene) {
@@ -35,11 +42,13 @@ export function OrganicWash({
   className = "",
   animated,
   priority = "low",
+  verticalCenter,
 }: OrganicWashProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const sizeRef = useRef({ width: 0, height: 0 });
-  const motionEnabled = animated ?? scene.motion ?? false;
+  const motionEnabled =
+    (animated ?? scene.motion ?? false) && !isMobileViewport();
   const [shouldPaint, setShouldPaint] = useState(priority === "high");
 
   useEffect(() => {
@@ -60,7 +69,7 @@ export function OrganicWash({
           observer.disconnect();
         }
       },
-      { rootMargin: "320px 0px" },
+      { rootMargin: washLazyRootMargin() },
     );
 
     observer.observe(container);
@@ -85,6 +94,8 @@ export function OrganicWash({
     let cancelled = false;
     let resizeTimer: number | undefined;
 
+    let layoutAttempts = 0;
+
     const paint = () => {
       if (cancelled) {
         return;
@@ -94,6 +105,10 @@ export function OrganicWash({
       const height = container.clientHeight;
 
       if (width < 1 || height < 1) {
+        if (layoutAttempts < 40) {
+          layoutAttempts += 1;
+          window.requestAnimationFrame(paint);
+        }
         return;
       }
 
@@ -108,7 +123,7 @@ export function OrganicWash({
 
       sizeRef.current = { width, height };
 
-      const pixelBudget = priority === "high" ? 380_000 : 200_000;
+      const pixelBudget = washPixelBudget(priority);
       const scale = Math.min(1, Math.sqrt(pixelBudget / (width * height)));
       const renderWidth = Math.max(280, Math.round(width * scale));
       const renderHeight = Math.max(160, Math.round(height * scale));
@@ -125,6 +140,7 @@ export function OrganicWash({
             renderWidth,
             renderHeight,
             averageWashOpacity(scene),
+            verticalCenter,
           ),
         );
       }, priority);
@@ -144,14 +160,14 @@ export function OrganicWash({
       window.clearTimeout(resizeTimer);
       observer.disconnect();
     };
-  }, [shouldPaint, scene.id, scene.washes, priority]);
+  }, [shouldPaint, scene.id, scene.washes, priority, verticalCenter]);
 
   return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-[1]">
+    <div ref={containerRef} className="pointer-events-none absolute inset-0">
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className={`h-full w-full mix-blend-multiply ${motionEnabled ? "watercolor-opacity-motion" : ""} ${className}`}
+        className={`h-full w-full ${motionEnabled ? "watercolor-opacity-motion" : ""} ${className}`}
       />
     </div>
   );

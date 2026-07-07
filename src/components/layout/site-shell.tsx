@@ -28,10 +28,11 @@ export function SiteShell({ children }: SiteShellProps) {
         Skip to content
       </a>
 
-      <header className="fixed top-0 right-0 left-0 z-50 border-b border-border/40 bg-ivory/90 backdrop-blur-md">
+      <header className="fixed top-0 right-0 left-0 z-50 overflow-hidden border-b border-border/30 bg-white/75 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+        <PaperTexture preset="cotton" lite className="opacity-[0.35]" />
         <nav
           aria-label="Main navigation"
-          className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4"
+          className="relative mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-2 sm:gap-3 sm:px-6 sm:py-4"
         >
           <Link
             href="/"
@@ -40,13 +41,13 @@ export function SiteShell({ children }: SiteShellProps) {
             {siteConfig.title}
           </Link>
 
-          <ul className="flex w-full items-center justify-between gap-3 overflow-x-auto sm:w-auto sm:justify-end sm:gap-6">
+          <ul className="scrollbar-none flex w-full items-center justify-between gap-1 overflow-x-auto sm:w-auto sm:justify-end sm:gap-6">
             {navLinks.map((link) => (
               <li key={link.href} className="shrink-0">
                 <a
                   href={link.href}
                   className={cn(
-                    "text-xs whitespace-nowrap text-muted-foreground transition-colors sm:text-sm",
+                    "inline-flex min-h-11 min-w-11 items-center justify-center px-2 text-xs whitespace-nowrap text-muted-foreground transition-colors sm:min-h-0 sm:min-w-0 sm:px-0 sm:text-sm",
                     "hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   )}
                 >

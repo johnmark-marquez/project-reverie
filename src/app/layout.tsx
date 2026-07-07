@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Cormorant_Garamond, Inter } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
@@ -18,6 +18,13 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-heading",
   weight: ["300", "400", "500", "600"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#faf8f5",
+};
 
 export const metadata: Metadata = {
   title: `${siteConfig.title} | ${siteConfig.wedding.dateFormatted}`,

@@ -37,7 +37,7 @@ export function RsvpPageHeader({
         </Text>
       ) : null}
 
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground sm:mt-8">
         <span className="inline-flex items-center gap-1.5">
           <CalendarHeart className="size-4 text-gold" aria-hidden="true" />
           {wedding.dateFormatted}

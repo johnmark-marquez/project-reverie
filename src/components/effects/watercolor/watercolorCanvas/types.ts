@@ -10,4 +10,5 @@ export interface WatercolorCanvasProps {
   lighting?: LightingPreset;
   animated?: boolean;
   quality?: RenderQuality;
+  washVerticalCenter?: number;
 }

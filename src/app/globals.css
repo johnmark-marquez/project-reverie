@@ -142,7 +142,7 @@
 
 @layer utilities {
   .text-display {
-    @apply font-heading text-5xl leading-tight font-light tracking-tight md:text-7xl;
+    @apply font-heading text-4xl leading-tight font-light tracking-tight sm:text-5xl md:text-7xl;
   }
   .text-h1 {
     @apply font-heading text-4xl leading-tight font-light tracking-tight md:text-5xl;
@@ -211,6 +211,10 @@
   .watercolor-motion .watercolor-wash {
     animation: none !important;
   }
+
+  .watercolor-opacity-motion {
+    animation: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -243,5 +247,16 @@
   }
   50% {
     transform: translateY(7px);
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }

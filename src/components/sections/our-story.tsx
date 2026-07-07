@@ -1,5 +1,6 @@
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
+import { SectionWashFade } from "@/components/effects/watercolor/section-wash-fade";
 import { SectionBackdrop } from "@/components/layout/section-backdrop";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
@@ -11,11 +12,12 @@ export function OurStory() {
     <Section
       id="story"
       aria-labelledby="story-heading"
-      className="relative overflow-hidden"
+      className="relative -mt-20 overflow-hidden pt-20 md:-mt-28 md:pt-24"
     >
       <SectionBackdrop preset="story" />
+      <SectionWashFade position="top" />
 
-      <Container>
+      <Container className="relative z-10">
         <FadeIn>
           <Ribbon className="mb-8 w-16" />
           <Heading as="h2" id="story-heading" className="mb-4">

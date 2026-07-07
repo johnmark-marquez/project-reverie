@@ -12,6 +12,7 @@ export type { WatercolorCanvasProps };
 export function WatercolorCanvas({
   quality: qualityOverride,
   scene,
+  washVerticalCenter,
   ...props
 }: WatercolorCanvasProps) {
   const detectedQuality = useRenderQuality();
@@ -19,10 +20,28 @@ export function WatercolorCanvas({
 
   switch (quality) {
     case "high":
-      return <HighQualityCanvas scene={scene} {...props} />;
+      return (
+        <HighQualityCanvas
+          scene={scene}
+          washVerticalCenter={washVerticalCenter}
+          {...props}
+        />
+      );
     case "medium":
-      return <MediumQualityCanvas scene={scene} {...props} />;
+      return (
+        <MediumQualityCanvas
+          scene={scene}
+          washVerticalCenter={washVerticalCenter}
+          {...props}
+        />
+      );
     case "low":
-      return <LowQualityCanvas scene={scene} {...props} />;
+      return (
+        <LowQualityCanvas
+          scene={scene}
+          washVerticalCenter={washVerticalCenter}
+          {...props}
+        />
+      );
   }
 }

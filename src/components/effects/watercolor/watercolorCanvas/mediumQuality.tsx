@@ -4,6 +4,7 @@ import { palette } from "@/lib/watercolor/palette";
 import { Lighting } from "../lighting";
 import { OrganicWash } from "../organicWash";
 import { PaperTexture } from "../paperTexture";
+import { WashEdgeMask } from "../section-wash-fade";
 import type { WatercolorCanvasProps } from "./types";
 
 /** Tablet — organic wash, static paper, opacity animation only. */
@@ -14,6 +15,7 @@ export function MediumQualityCanvas({
   texture,
   lighting,
   animated,
+  washVerticalCenter,
 }: WatercolorCanvasProps) {
   const texturePreset = texture ?? scene.texture ?? "cotton";
   const lightingPreset = lighting ?? scene.lighting ?? "morning";
@@ -21,12 +23,20 @@ export function MediumQualityCanvas({
 
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
+      className={`relative isolate overflow-hidden ${className}`}
       style={{ backgroundColor: palette[scene.background] }}
     >
-      <OrganicWash scene={scene} animated={motionEnabled} priority="high" />
-      <PaperTexture preset={texturePreset} lite />
-      <Lighting preset={lightingPreset} />
+      <PaperTexture preset={texturePreset} lite className="z-0" />
+      <WashEdgeMask edge="bottom">
+        <OrganicWash
+          scene={scene}
+          animated={motionEnabled}
+          priority="high"
+          verticalCenter={washVerticalCenter}
+          className="h-full w-full"
+        />
+      </WashEdgeMask>
+      <Lighting preset={lightingPreset} className="z-[2] opacity-60" />
       <div className="relative z-10">{children}</div>
     </div>
   );

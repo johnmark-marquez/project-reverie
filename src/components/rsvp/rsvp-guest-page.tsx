@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import type { Guest } from "@/types/rsvp-api";
 
 const fieldClassName =
-  "w-full rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-foreground focus:border-gold/60 focus:ring-2 focus:ring-gold/20";
+  "w-full rounded-lg border border-border/60 bg-background px-3 py-2.5 text-base text-ink outline-none transition-colors placeholder:text-muted-foreground focus:border-gold/60 focus:ring-2 focus:ring-gold/20 sm:text-sm";
 
 interface RsvpGuestPageProps {
   fallbackCode?: string;

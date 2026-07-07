@@ -10,22 +10,15 @@ export function ScrollCue() {
     <motion.a
       href="#story"
       aria-label="Scroll to our story"
-      className="mt-10 flex flex-col items-center gap-0.5 text-muted-foreground transition-colors hover:text-gold"
-      animate={prefersReducedMotion ? undefined : { y: [0, 7, 0] }}
+      className="mt-10 inline-flex text-muted-foreground transition-colors hover:text-gold"
+      animate={prefersReducedMotion ? undefined : { y: [0, 5, 0] }}
       transition={
         prefersReducedMotion
           ? undefined
-          : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+          : { duration: 2.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.5 }
       }
     >
-      {[0, 1, 2].map((i) => (
-        <ChevronDown
-          key={i}
-          className="size-4 opacity-70"
-          style={{ opacity: 0.9 - i * 0.25 }}
-          aria-hidden="true"
-        />
-      ))}
+      <ChevronDown className="size-5 opacity-75" aria-hidden="true" />
     </motion.a>
   );
 }

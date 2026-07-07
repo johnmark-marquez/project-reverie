@@ -20,28 +20,45 @@ function drainQueue() {
   }
 }
 
-/** Run heavy wash paints one at a time during idle time. */
-export function scheduleWashPaint(job: PaintJob, priority: "high" | "low" = "low") {
-  if (priority === "high") {
-    queue.unshift(job);
-  } else {
-    queue.push(job);
-  }
-
+function startDrain() {
   if (draining) {
     return;
   }
 
   draining = true;
 
-  if (priority === "high" && queue.length === 1) {
-    window.requestAnimationFrame(drainQueue);
-    return;
-  }
-
   if (typeof window.requestIdleCallback === "function") {
     window.requestIdleCallback(drainQueue, { timeout: 120 });
   } else {
     window.setTimeout(drainQueue, 0);
   }
+}
+
+/** Run heavy wash paints one at a time; hero paints immediately. */
+export function scheduleWashPaint(job: PaintJob, priority: "high" | "low" = "low") {
+  if (priority === "high" && !draining && queue.length === 0) {
+    job();
+    return;
+  }
+
+  if (priority === "high") {
+    queue.unshift(job);
+  } else {
+    queue.push(job);
+  }
+
+  if (priority === "high" && draining) {
+    return;
+  }
+
+  if (priority === "high") {
+    window.requestAnimationFrame(() => {
+      if (!draining) {
+        startDrain();
+      }
+    });
+    return;
+  }
+
+  startDrain();
 }

@@ -2,12 +2,12 @@
 
 import { palette } from "@/lib/watercolor/palette";
 import { Lighting } from "../lighting";
-import { Motion } from "../motion";
 import { OrganicWash } from "../organicWash";
 import { PaperTexture } from "../paperTexture";
+import { WashEdgeMask } from "../section-wash-fade";
 import type { WatercolorCanvasProps } from "./types";
 
-/** Desktop — full organic wash, paper grain, drift motion. */
+/** Desktop — organic wash above paper grain, soft lighting. */
 export function HighQualityCanvas({
   scene,
   children,
@@ -15,6 +15,7 @@ export function HighQualityCanvas({
   texture,
   lighting,
   animated,
+  washVerticalCenter,
 }: WatercolorCanvasProps) {
   const texturePreset = texture ?? scene.texture ?? "cotton";
   const lightingPreset = lighting ?? scene.lighting ?? "morning";
@@ -22,16 +23,20 @@ export function HighQualityCanvas({
 
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
+      className={`relative isolate overflow-hidden ${className}`}
       style={{ backgroundColor: palette[scene.background] }}
     >
-      <Motion enabled={motionEnabled}>
-        <OrganicWash scene={scene} animated={motionEnabled} priority="high" />
-      </Motion>
-
-      <PaperTexture preset={texturePreset} />
-      <Lighting preset={lightingPreset} />
-
+      <PaperTexture preset={texturePreset} lite className="z-0" />
+      <WashEdgeMask edge="bottom">
+        <OrganicWash
+          scene={scene}
+          animated={motionEnabled}
+          priority="high"
+          verticalCenter={washVerticalCenter}
+          className="h-full w-full"
+        />
+      </WashEdgeMask>
+      <Lighting preset={lightingPreset} className="z-[2] opacity-60" />
       <div className="relative z-10">{children}</div>
     </div>
   );
