@@ -59,20 +59,36 @@ export function Venues() {
                     <span className="text-body">{venue.address}</span>
                   </div>
                   <p className="font-heading text-lg text-gold">{venue.time}</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    nativeButton={false}
-                    render={
-                      <a
-                        href={venue.mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      />
-                    }
-                  >
-                    View on Maps
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      nativeButton={false}
+                      render={
+                        <a
+                          href={venue.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      }
+                    >
+                      Google Maps
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      nativeButton={false}
+                      render={
+                        <a
+                          href={venue.wazeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      }
+                    >
+                      Waze
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </FadeIn>

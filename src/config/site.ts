@@ -14,12 +14,16 @@ export const siteConfig = {
       time: "2:00 PM",
       mapsUrl:
         "https://maps.google.com/?q=Don+Bosco+Chapel+on+the+Hill+Tagaytay",
+      wazeUrl:
+        "https://ul.waze.com/ul?venue_id=79167629.791938430.1565906&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location",
     },
     reception: {
       venue: "Narra Hill",
       address: "Tagaytay City, Cavite",
       time: "5:00 PM",
       mapsUrl: "https://maps.google.com/?q=Narra+Hill+Tagaytay",
+      wazeUrl:
+        "https://ul.waze.com/ul?venue_id=79233165.792200576.14776236&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location",
     },
   },
 
