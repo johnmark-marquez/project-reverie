@@ -3,7 +3,7 @@ export const siteConfig = {
 
   projectName: "Project Reverie",
 
-  tagline: "Two hearts, one beautiful beginning",
+  tagline: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
 
   wedding: {
     date: new Date("2028-02-10T14:00:00+08:00"),
@@ -25,7 +25,7 @@ export const siteConfig = {
 
   rsvp: {
     url: "https://forms.google.com/",
-    deadline: "January 15, 2028",
+    deadline: "To be announced",
     message: "We can't wait to celebrate with you. Please let us know if you'll be joining us.",
   },
 
@@ -44,11 +44,6 @@ export const siteConfig = {
       question: "Is there parking available?",
       answer:
         "Yes, complimentary parking is available at both the chapel and reception venue. Valet service will be provided at Narra Hill.",
-    },
-    {
-      question: "Can I bring a plus-one?",
-      answer:
-        "Due to venue capacity, we can only accommodate guests formally invited on your invitation. Please refer to your RSVP for the number of seats reserved.",
     },
     {
       question: "Where should we stay?",

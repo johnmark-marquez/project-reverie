@@ -1,3 +1,4 @@
+/** Six handcrafted brush silhouettes — reusable SVG paths */
 export const watercolorShapes = {
   bloom: `
     M182 26
@@ -5,14 +6,6 @@ export const watercolorShapes = {
     C360 200 310 285 220 305
     C140 325 60 265 42 180
     C22 95 90 45 182 26Z
-  `,
-
-  petal: `
-    M160 40
-    C250 20 340 80 330 175
-    C320 265 220 330 135 300
-    C55 270 25 175 55 90
-    C85 40 120 30 160 40Z
   `,
 
   cloud: `
@@ -31,7 +24,15 @@ export const watercolorShapes = {
     C100 300 20 260 40 180Z
   `,
 
-  drift: `
+  petal: `
+    M160 40
+    C250 20 340 80 330 175
+    C320 265 220 330 135 300
+    C55 270 25 175 55 90
+    C85 40 120 30 160 40Z
+  `,
+
+  wash: `
     M200 30
     C280 50 360 100 370 180
     C380 260 320 330 230 340
@@ -39,7 +40,7 @@ export const watercolorShapes = {
     C50 130 120 50 200 30Z
   `,
 
-  pool: `
+  splash: `
     M100 100
     C180 40 300 50 340 130
     C380 210 320 310 220 330

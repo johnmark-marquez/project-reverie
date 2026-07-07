@@ -1,33 +1,37 @@
-import { palette } from "@/lib/watercolor/palette";
-import type { WatercolorWash } from "./types";
-import { getWatercolorFilterUrl } from "./watercolorFilters";
-import { WatercolorShape } from "./waterColorShape";
+import type { RenderedWash } from "@/lib/watercolor/renderer";
+import { getWatercolorFilterUrl } from "./watercolorFilter";
+import { WatercolorShape } from "./watercolorShape";
 
 interface Props {
-  wash: WatercolorWash;
+  wash: RenderedWash;
   useFilter?: boolean;
 }
 
 export function WatercolorLayer({ wash, useFilter = true }: Props) {
+  const cssBlur = Math.max(10, Math.round(wash.blur * 0.4));
+
   return (
     <div
       className="absolute watercolor-wash"
       style={{
-        left: wash.x,
-        top: wash.y,
+        left: wash.left,
+        top: wash.top,
         width: wash.size,
         height: wash.size,
         opacity: wash.opacity,
-        filter: `blur(${wash.blur}px)`,
+        zIndex: Math.round(wash.depth * 10) + 1,
+        filter: `blur(${cssBlur}px)`,
+        mixBlendMode: "multiply",
         transform: `
           translate(-50%, -50%)
-          rotate(${wash.rotation ?? 0}deg)
+          rotate(${wash.rotation}deg)
+          scale(${wash.scale})
         `,
       }}
     >
       <WatercolorShape
-        path={wash.shape}
-        color={palette[wash.color]}
+        shape={wash.shape}
+        color={wash.color}
         filterUrl={useFilter ? getWatercolorFilterUrl() : undefined}
       />
     </div>

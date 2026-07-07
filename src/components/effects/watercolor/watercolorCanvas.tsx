@@ -1,39 +1,55 @@
 import { palette } from "@/lib/watercolor/palette";
+import { renderScene } from "@/lib/watercolor/renderer";
+import type { LightingPreset, TexturePreset } from "@/lib/watercolor/themes";
+import { Lighting } from "./lighting";
+import { Motion } from "./motion";
 import { PaperTexture } from "./paperTexture";
 import type { WatercolorScene } from "./types";
-import { WatercolorFilters } from "./watercolorFilters";
+import { WatercolorFilter } from "./watercolorFilter";
 import { WatercolorLayer } from "./watercolorLayer";
 
 interface Props {
   scene: WatercolorScene;
   children?: React.ReactNode;
   className?: string;
-  animate?: boolean;
+  texture?: TexturePreset;
+  lighting?: LightingPreset;
+  animated?: boolean;
 }
 
+/**
+ * Watercolor Engine public API.
+ *
+ * Scene → Composition → Washes → Texture → Lighting → Motion → Content
+ */
 export function WatercolorCanvas({
   scene,
   children,
   className = "",
-  animate = false,
+  texture,
+  lighting,
+  animated,
 }: Props) {
+  const texturePreset = texture ?? scene.texture ?? "cotton";
+  const lightingPreset = lighting ?? scene.lighting ?? "morning";
+  const motionEnabled = animated ?? scene.motion ?? false;
+  const washes = renderScene(scene, { lighting: lightingPreset });
+
   return (
     <div
       className={`relative overflow-hidden ${className}`}
       style={{ backgroundColor: palette[scene.background] }}
     >
-      <WatercolorFilters />
+      <WatercolorFilter />
 
-      <div
-        className={`absolute inset-0 ${animate ? "watercolor-drift" : ""}`}
-        aria-hidden="true"
-      >
-        {scene.washes.map((wash, index) => (
-          <WatercolorLayer key={`${scene.name}-${index}`} wash={wash} />
+      <Motion enabled={motionEnabled}>
+        {washes.map((wash) => (
+          <WatercolorLayer key={wash.key} wash={wash} />
         ))}
-      </div>
+      </Motion>
 
-      <PaperTexture />
+      <PaperTexture preset={texturePreset} />
+      <Lighting preset={lightingPreset} />
 
       <div className="relative z-10">{children}</div>
     </div>

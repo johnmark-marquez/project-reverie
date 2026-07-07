@@ -2,12 +2,12 @@ import { watercolorShapes } from "./shapes";
 import type { WatercolorShapeName } from "./types";
 
 interface Props {
-  path: WatercolorShapeName;
+  shape: WatercolorShapeName;
   color: string;
   filterUrl?: string;
 }
 
-export function WatercolorShape({ path, color, filterUrl }: Props) {
+export function WatercolorShape({ shape, color, filterUrl }: Props) {
   return (
     <svg
       viewBox="0 0 400 350"
@@ -15,7 +15,7 @@ export function WatercolorShape({ path, color, filterUrl }: Props) {
       preserveAspectRatio="xMidYMid meet"
     >
       <path
-        d={watercolorShapes[path]}
+        d={watercolorShapes[shape]}
         fill={color}
         filter={filterUrl}
       />

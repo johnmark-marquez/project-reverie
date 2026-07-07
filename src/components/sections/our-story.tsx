@@ -33,18 +33,16 @@ export function OurStory() {
             <div className="space-y-4">
               <Heading as="h3">How we met</Heading>
               <Text className="text-muted-foreground">
-                [Your story here — how you first met, what drew you together,
-                and the moment you knew this was something special.]
+                [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.]
               </Text>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.2}>
             <div className="space-y-4">
-              <Heading as="h3">The proposal</Heading>
+              <Heading as="h3">How we got engaged</Heading>
               <Text className="text-muted-foreground">
-                [Your story here — the proposal, the yes, and the joy of
-                beginning this next chapter together.]
+                [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.]
               </Text>
             </div>
           </FadeIn>

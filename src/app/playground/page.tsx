@@ -22,11 +22,15 @@ export default function PlaygroundPage() {
       </header>
 
       {scenes.map(({ label, scene }) => (
-        <div key={scene.name} className="border-b border-border">
+        <div key={scene.id} className="border-b border-border">
           <p className="px-6 py-3 text-sm font-medium text-muted-foreground">
-            {label} ({scene.name})
+            {label} ({scene.id}) — {scene.texture} / {scene.lighting}
           </p>
-          <WatercolorCanvas scene={scene} className="h-[60vh]" animate={scene.name === "hero"} />
+          <WatercolorCanvas
+            scene={scene}
+            className="h-[60vh]"
+            animated={scene.motion}
+          />
         </div>
       ))}
     </div>
