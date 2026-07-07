@@ -6,20 +6,7 @@ import { Section } from "@/components/layout/section";
 import { Heading, Text } from "@/components/ui/typography";
 import { siteConfig } from "@/config/site";
 
-const events = [
-  {
-    time: siteConfig.wedding.ceremony.time,
-    title: "Ceremony",
-    venue: siteConfig.wedding.ceremony.venue,
-    description: "Join us as we exchange vows overlooking the hills of Tagaytay.",
-  },
-  {
-    time: siteConfig.wedding.reception.time,
-    title: "Reception",
-    venue: siteConfig.wedding.reception.venue,
-    description: "Dinner, dancing, and celebration under the stars.",
-  },
-];
+const events = siteConfig.wedding.itinerary;
 
 export function Timeline() {
   return (
@@ -61,13 +48,26 @@ export function Timeline() {
                 />
 
                 <div className="flex-1 pl-10 md:pl-0">
-                  <p className="font-heading text-2xl text-gold">{event.time}</p>
-                  <Heading as="h3" className="mt-1">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <p className="font-heading text-2xl text-gold">
+                      {event.start}
+                      <span className="mx-2 text-muted-foreground/60">–</span>
+                      {event.end}
+                    </p>
+                    {"duration" in event && event.duration ? (
+                      <span className="text-caption rounded-full border border-border/70 bg-card/60 px-2.5 py-0.5">
+                        {event.duration}
+                      </span>
+                    ) : null}
+                  </div>
+                  <Heading as="h3" className="mt-2">
                     {event.title}
                   </Heading>
-                  <Text className="mt-1 font-medium text-ink">
-                    {event.venue}
-                  </Text>
+                  {"venue" in event && event.venue ? (
+                    <Text className="mt-1 font-medium text-ink">
+                      {event.venue}
+                    </Text>
+                  ) : null}
                   <Text className="mt-2 text-muted-foreground">
                     {event.description}
                   </Text>

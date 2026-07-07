@@ -1,4 +1,5 @@
 import { MapPin } from "lucide-react";
+import Image from "next/image";
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
 import { SectionBackdrop } from "@/components/layout/section-backdrop";
@@ -45,21 +46,30 @@ export function Venues() {
           </Text>
         </FadeIn>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2 lg:gap-10">
           {venues.map((venue, index) => (
             <FadeIn key={venue.type} delay={index * 0.1}>
-              <Card className="h-full">
-                <CardHeader>
+              <Card className="h-full overflow-hidden p-0">
+                <div className="relative aspect-[16/10] w-full">
+                  <Image
+                    src={venue.image}
+                    alt={venue.imageAlt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <CardHeader className="gap-2 px-6 pt-6 pb-0">
                   <CardDescription>{venue.type}</CardDescription>
                   <CardTitle>{venue.venue}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start gap-2 text-muted-foreground">
+                <CardContent className="space-y-5 px-6 pt-4 pb-7">
+                  <div className="flex items-start gap-2.5 text-muted-foreground">
                     <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                     <span className="text-body">{venue.address}</span>
                   </div>
                   <p className="font-heading text-lg text-gold">{venue.time}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3 pt-1">
                     <Button
                       variant="outline"
                       size="sm"

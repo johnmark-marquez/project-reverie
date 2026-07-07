@@ -12,6 +12,9 @@ export const siteConfig = {
       venue: "Don Bosco Chapel on the Hill",
       address: "Tagaytay City, Cavite",
       time: "2:00 PM",
+      image: "/venues/chapel-on-the-hill.jpg",
+      imageAlt:
+        "Don Bosco Chapel on the Hill, a circular glass chapel overlooking Tagaytay",
       mapsUrl:
         "https://maps.google.com/?q=Don+Bosco+Chapel+on+the+Hill+Tagaytay",
       wazeUrl:
@@ -20,11 +23,38 @@ export const siteConfig = {
     reception: {
       venue: "Narra Hill",
       address: "Tagaytay City, Cavite",
-      time: "5:00 PM",
+      time: "5:30 PM",
+      image: "/venues/narra-hill.jpg",
+      imageAlt: "Narra Hill pavilion with gardens and views of Taal Lake",
       mapsUrl: "https://maps.google.com/?q=Narra+Hill+Tagaytay",
       wazeUrl:
         "https://ul.waze.com/ul?venue_id=79233165.792200576.14776236&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location",
     },
+    itinerary: [
+      {
+        start: "2:00 PM",
+        end: "3:00 PM",
+        title: "Ceremony proper",
+        venue: "Don Bosco Chapel on the Hill",
+        description:
+          "Join us as we exchange vows overlooking the hills of Tagaytay.",
+      },
+      {
+        start: "3:30 PM",
+        end: "5:30 PM",
+        duration: "2 hrs",
+        title: "Cocktails",
+        description: "May include travel between venues.",
+      },
+      {
+        start: "5:30 PM",
+        end: "8:00 PM",
+        duration: "2 hrs 30 min",
+        title: "Reception",
+        venue: "Narra Hill",
+        description: "Estimated reception proper — dinner, dancing, and celebration.",
+      },
+    ],
   },
 
   rsvp: {
@@ -47,7 +77,7 @@ export const siteConfig = {
     {
       question: "Is there parking available?",
       answer:
-        "Yes, complimentary parking is available at both the chapel and reception venue. Valet service will be provided at Narra Hill.",
+        "Yes, parking is available at both the chapel and reception venue. ",
     },
     {
       question: "Where should we stay?",
