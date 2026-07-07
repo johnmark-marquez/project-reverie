@@ -7,6 +7,7 @@ export interface Guest {
   status: RsvpStatus;
   confirmedHeadcount: number;
   lastUpdated: string | null;
+  confirmedGuestNames?: string[];
 }
 
 export interface GetGuestResponse {
@@ -18,6 +19,7 @@ export interface SubmitRsvpRequest {
   guestCode: string;
   attending: boolean;
   confirmedSeats: number;
+  guestNames?: string[];
   message?: string;
 }
 

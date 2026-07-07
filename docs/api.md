@@ -35,6 +35,7 @@ Project Reverie — Google Apps Script backend ↔ Next.js frontend.
 | H | `confirmedHeadcount` | number | Confirmed headcount after RSVP |
 | I | `lastUpdated` | ISO datetime | Last RSVP change |
 | J | `table` | string | Table number at reception (not written by API) |
+| K | `confirmedGuestNames` | string | Semicolon-separated names when attending (API writes) |
 
 ### Sheet: `RSVP Log` (audit trail)
 
@@ -44,7 +45,8 @@ Project Reverie — Google Apps Script backend ↔ Next.js frontend.
 | B | `guestCode` | string |
 | C | `response` | `Accepted` \| `Declined` |
 | D | `headcount` | number |
-| E | `message` | string |
+| E | `guestNames` | string | Semicolon-separated when multi-guest |
+| F | `message` | string |
 
 ---
 
@@ -158,6 +160,7 @@ Content-Type: application/json
 | `guestCode` | string | yes | Must exist in Guest List |
 | `attending` | boolean | yes | `true` = accept, `false` = decline |
 | `confirmedSeats` | number | if attending | `1..seats` when attending; `0` when declining |
+| `guestNames` | string[] | if `seats >= 2` and attending | One name per attending guest |
 | `message` | string | no | Max 1000 chars |
 
 #### Response `200 OK`

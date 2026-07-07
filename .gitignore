@@ -154,3 +154,6 @@ vite.config.ts.timestamp-*
 
 # Next.js generated types
 next-env.d.ts
+
+# Generated invite QR codes
+qr-codes/

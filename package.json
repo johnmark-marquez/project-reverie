@@ -8,6 +8,8 @@
     "build": "next build",
     "build:pages": "GITHUB_PAGES=true next build && node scripts/expand-rsvp-paths.mjs",
     "preview:pages": "pnpm build:pages && node scripts/preview-pages.mjs",
+    "generate:qr-codes": "node scripts/generate-qr-codes.mjs",
+    "sync:guest-list": "node scripts/sync-guest-list.mjs",
     "start": "next start",
     "lint": "eslint"
   },
@@ -36,6 +38,7 @@
     "lint-staged": "^17.0.8",
     "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

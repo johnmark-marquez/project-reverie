@@ -45,6 +45,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
 
   const [attending, setAttending] = useState<boolean | null>(null);
   const [confirmedSeats, setConfirmedSeats] = useState(1);
+  const [guestNames, setGuestNames] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -64,6 +65,20 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
       setGuest(data);
       setConfirmedSeats(
         data.confirmedHeadcount > 0 ? data.confirmedHeadcount : data.seats || 1,
+      );
+
+      const seatCount =
+        data.confirmedHeadcount > 0 ? data.confirmedHeadcount : data.seats || 1;
+      const savedNames = data.confirmedGuestNames ?? [];
+
+      setGuestNames(
+        Array.from({ length: seatCount }, (_, index) => {
+          if (savedNames[index]) {
+            return savedNames[index];
+          }
+
+          return index === 0 ? data.name : "";
+        }),
       );
 
       if (data.status === "Confirmed") {
@@ -86,11 +101,40 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
     void loadGuest();
   }, [loadGuest]);
 
+  useEffect(() => {
+    if (!guest || attending !== true || guest.seats < 2) {
+      return;
+    }
+
+    setGuestNames((previous) =>
+      Array.from({ length: confirmedSeats }, (_, index) => {
+        if (previous[index]?.trim()) {
+          return previous[index];
+        }
+
+        if (guest.confirmedGuestNames?.[index]) {
+          return guest.confirmedGuestNames[index];
+        }
+
+        return index === 0 ? guest.name : "";
+      }),
+    );
+  }, [attending, confirmedSeats, guest]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!guest || attending === null) {
       return;
+    }
+
+    if (attending && guest.seats >= 2) {
+      const trimmedNames = guestNames.map((name) => name.trim()).slice(0, confirmedSeats);
+
+      if (trimmedNames.length !== confirmedSeats || trimmedNames.some((name) => !name)) {
+        setSubmitError("Please enter a name for each guest attending.");
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -101,6 +145,10 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
         guestCode: normalizedCode,
         attending,
         confirmedSeats: attending ? confirmedSeats : 0,
+        guestNames:
+          attending && guest.seats >= 2
+            ? guestNames.map((name) => name.trim()).slice(0, confirmedSeats)
+            : undefined,
         message: message.trim() || undefined,
       });
 
@@ -266,6 +314,40 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
                     )}
                   </select>
                 </div>
+              ) : null}
+
+              {attending && guest.seats >= 2 ? (
+                <fieldset className="space-y-3">
+                  <legend className="text-sm font-medium text-ink">
+                    Names of guests attending
+                  </legend>
+                  {Array.from({ length: confirmedSeats }, (_, index) => (
+                    <div key={index} className="space-y-2">
+                      <label
+                        htmlFor={`guest-name-${index}`}
+                        className="text-sm font-medium text-ink"
+                      >
+                        Guest {index + 1}
+                      </label>
+                      <input
+                        id={`guest-name-${index}`}
+                        type="text"
+                        required
+                        value={guestNames[index] ?? ""}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setGuestNames((previous) => {
+                            const next = [...previous];
+                            next[index] = value;
+                            return next;
+                          });
+                        }}
+                        placeholder={index === 0 ? guest.name : "Full name"}
+                        className={fieldClassName}
+                      />
+                    </div>
+                  ))}
+                </fieldset>
               ) : null}
 
               <div className="space-y-2">

@@ -17,7 +17,7 @@
 const GUEST_LIST_SHEET = "Guest List";
 const RSVP_LOG_SHEET = "RSVP Log";
 /** Bump when redeploying — verify at {WEB_APP_URL}?path=ping */
-const API_VERSION = 5;
+const API_VERSION = 6;
 const GUEST_CODE_PATTERN = /^([A-Z0-9]{2,6}-[A-Z0-9]{4,10}|[A-Z]{2}\d{3})$/;
 
 /** Guest List columns (0-based). RSVP writes only rsvpStatus, confirmedHeadcount, lastUpdated. */
@@ -32,6 +32,7 @@ rsvpStatus: 6,
 confirmedHeadcount: 7,
 lastUpdated: 8,
 table: 9,
+confirmedGuestNames: 10,
 };
 
 function doGet(e) {
@@ -108,6 +109,11 @@ try {
   }
 
   const message = truncate(String(body.message || ""), 1000);
+  const guestNames = parseSubmittedGuestNames(body, guest, attending, confirmedSeats);
+
+  if (guestNames && guestNames.error) {
+    return guestNames.error;
+  }
 
   const status = attending ? "Confirmed" : "Declined";
   const response = attending ? "Accepted" : "Declined";
@@ -117,6 +123,7 @@ try {
     status: status,
     confirmedHeadcount: attending ? confirmedSeats : 0,
     lastUpdated: now,
+    confirmedGuestNames: attending && guest.seats >= 2 ? formatGuestNames(guestNames) : "",
   });
 
   appendRsvpLog({
@@ -124,6 +131,7 @@ try {
     guestCode: guestCode,
     response: response,
     headcount: attending ? confirmedSeats : 0,
+    guestNames: attending && guest.seats >= 2 ? formatGuestNames(guestNames) : "",
     message: message,
   });
 
@@ -201,6 +209,7 @@ return jsonOk({
   status: guest.status,
   confirmedHeadcount: guest.confirmedHeadcount,
   lastUpdated: guest.lastUpdated,
+  confirmedGuestNames: guest.confirmedGuestNames,
 });
 }
 
@@ -245,6 +254,7 @@ for (let i = 1; i < values.length; i++) {
       lastUpdated: row[COL.lastUpdated]
         ? new Date(row[COL.lastUpdated]).toISOString()
         : null,
+      confirmedGuestNames: parseGuestNames(row[COL.confirmedGuestNames]),
     };
   }
 }
@@ -258,6 +268,10 @@ const sheet = getSheet(GUEST_LIST_SHEET);
 sheet.getRange(rowIndex, COL.rsvpStatus + 1).setValue(update.status);
 sheet.getRange(rowIndex, COL.confirmedHeadcount + 1).setValue(update.confirmedHeadcount);
 sheet.getRange(rowIndex, COL.lastUpdated + 1).setValue(update.lastUpdated);
+
+if (update.confirmedGuestNames !== undefined) {
+  sheet.getRange(rowIndex, COL.confirmedGuestNames + 1).setValue(update.confirmedGuestNames);
+}
 }
 
 function appendRsvpLog(entry) {
@@ -268,6 +282,7 @@ sheet.appendRow([
   entry.guestCode,
   entry.response,
   entry.headcount,
+  entry.guestNames,
   entry.message,
 ]);
 }
@@ -294,6 +309,59 @@ return new Date() > new Date(deadline);
 
 function truncate(value, max) {
 return value.length > max ? value.slice(0, max) : value;
+}
+
+function parseGuestNames(value) {
+const raw = String(value || "").trim();
+
+if (!raw) {
+  return [];
+}
+
+return raw.split(/\s*;\s*/).filter(Boolean);
+}
+
+function formatGuestNames(names) {
+return names
+  .map(function (name) {
+    return String(name || "").trim();
+  })
+  .filter(Boolean)
+  .join("; ");
+}
+
+function parseSubmittedGuestNames(body, guest, attending, confirmedSeats) {
+if (!attending || guest.seats < 2) {
+  return [];
+}
+
+if (!Array.isArray(body.guestNames)) {
+  return {
+    error: jsonError(
+      400,
+      "INVALID_PAYLOAD",
+      "guestNames must be an array when your invitation includes multiple guests.",
+    ),
+  };
+}
+
+const names = body.guestNames
+  .map(function (name) {
+    return truncate(String(name || "").trim(), 200);
+  })
+  .filter(Boolean);
+
+if (names.length !== confirmedSeats) {
+  return {
+    error: jsonError(
+      400,
+      "INVALID_PAYLOAD",
+      "Please provide a name for each guest attending.",
+    ),
+  };
+}
+
+return names;
 }
 
 function jsonOk(data) {
