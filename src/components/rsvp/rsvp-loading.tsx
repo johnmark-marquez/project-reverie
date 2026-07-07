@@ -1,3 +1,4 @@
+import { Ribbon } from "@/components/common/ribbon";
 import { Text } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 
@@ -12,8 +13,9 @@ export function RsvpLoading({
 }: RsvpLoadingProps) {
   return (
     <div className={cn("mx-auto max-w-lg px-6 text-center", className)}>
+      <Ribbon className="mx-auto mb-6 w-20 opacity-80" />
       <div
-        className="mx-auto mb-4 size-8 animate-spin rounded-full border-2 border-gold/30 border-t-gold"
+        className="mx-auto mb-4 size-9 animate-spin rounded-full border-2 border-gold/25 border-t-gold"
         role="status"
         aria-label="Loading"
       />

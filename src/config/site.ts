@@ -67,6 +67,8 @@ export const siteConfig = {
     note: "Scan the QR code on your invite, or enter your code below.",
     fields: [
       "Will you be attending?",
+      "Number of guests attending",
+      "Guest name(s) for those with more than 1 guest",
       "Message for the couple",
     ],
   },
@@ -94,7 +96,7 @@ export const siteConfig = {
     {
       question: "Is there parking available?",
       answer:
-        "Yes, parking is available at both the chapel and reception venue. There is a dedicated parking area on the Narra Hill venue for guests while for the chapel, it may be a bit challenging to find parking since the only street parking is available, we suggest to arrive early to secure a spot.",
+        "Yes, parking is available at both the chapel and reception venue. There is a dedicated parking area on the Narra Hill venue for guests while for the chapel, it may be a bit challenging to find parking since only street parking is available, we suggest to arrive early to secure a spot.",
     },
     {
       question: "Where should we stay?",

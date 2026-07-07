@@ -2,15 +2,18 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { Text } from "@/components/ui/typography";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+  RsvpDecorCard,
+} from "@/components/rsvp/rsvp-decor-card";
 import { RsvpCodeForm } from "@/components/rsvp/rsvp-code-form";
+import { RsvpMountFade } from "@/components/rsvp/rsvp-mount-fade";
 import { RsvpPageHeader } from "@/components/rsvp/rsvp-page-header";
+import { siteConfig } from "@/config/site";
 
 function CodeEntryContent() {
   const searchParams = useSearchParams();
@@ -18,24 +21,27 @@ function CodeEntryContent() {
 
   return (
     <>
-      <RsvpPageHeader
-        title="RSVP"
-        description="Enter the invitation code from your invite to respond."
-      />
+      <RsvpMountFade>
+        <RsvpPageHeader
+          title="RSVP"
+          description={siteConfig.rsvp.message}
+        />
+      </RsvpMountFade>
 
-      <div className="mx-auto max-w-lg px-6">
-        <Card className="text-left">
+      <RsvpMountFade delay={0.08} className="mx-auto max-w-lg px-6">
+        <RsvpDecorCard contentClassName="text-left">
           <CardHeader>
             <CardTitle>Invitation code</CardTitle>
-            <CardDescription>
-              It&apos;s sent to you via message/email or scanned from QR code.
-            </CardDescription>
+            <CardDescription>{siteConfig.rsvp.note}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <RsvpCodeForm initialCode={initialCode} />
+            <Text variant="caption" className="text-muted-foreground">
+              Example format: RVR-4RBSN
+            </Text>
           </CardContent>
-        </Card>
-      </div>
+        </RsvpDecorCard>
+      </RsvpMountFade>
     </>
   );
 }

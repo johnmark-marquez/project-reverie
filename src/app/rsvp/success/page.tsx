@@ -4,16 +4,17 @@ import { CheckCircle2, Heart } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { Ribbon } from "@/components/common/ribbon";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/typography";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Heading, Text } from "@/components/ui/typography";
+  RsvpDecorCard,
+} from "@/components/rsvp/rsvp-decor-card";
+import { RsvpMountFade } from "@/components/rsvp/rsvp-mount-fade";
+import { RsvpPageHeader } from "@/components/rsvp/rsvp-page-header";
 import { RsvpShell } from "@/components/rsvp/rsvp-shell";
 import { rsvpPath } from "@/lib/guest-code";
 
@@ -25,50 +26,60 @@ function SuccessContent() {
   const declined = status === "Declined";
 
   return (
-    <div className="mx-auto max-w-lg px-6 text-center">
-      <Ribbon className="mx-auto mb-6 w-16" />
-      <div className="mb-4 flex justify-center">
-        {declined ? (
-          <Heart className="size-12 text-muted-foreground" aria-hidden="true" />
-        ) : (
-          <CheckCircle2 className="size-12 text-gold" aria-hidden="true" />
-        )}
-      </div>
-      <Heading as="h1" className="mb-3">
-        {declined ? "We'll miss you" : "Thank you!"}
-      </Heading>
-      <Text className="mb-8 text-muted-foreground">
-        {declined
-          ? "Your response has been recorded. We hope to celebrate with you another time."
-          : "Your RSVP has been received. We can't wait to celebrate with you."}
-      </Text>
+    <>
+      <RsvpMountFade>
+        <div className="mx-auto max-w-lg px-6 text-center">
+          <div className="mb-4 flex justify-center">
+            {declined ? (
+              <Heart className="size-12 text-muted-foreground" aria-hidden="true" />
+            ) : (
+              <CheckCircle2 className="size-12 text-gold" aria-hidden="true" />
+            )}
+          </div>
+          <RsvpPageHeader
+            title={declined ? "We'll miss you" : "Thank you!"}
+            description={
+              declined
+                ? "Your response has been recorded. We hope to celebrate with you another time."
+                : "Your RSVP has been received. We can't wait to celebrate with you."
+            }
+            showDeadline={false}
+          />
+        </div>
+      </RsvpMountFade>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All set</CardTitle>
-          <CardDescription>
-            {code
-              ? `Confirmation saved for invitation ${code}.`
-              : "Your response is saved."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {code ? (
-            <Button
-              nativeButton={false}
-              variant="outline"
-              className="w-full"
-              render={<Link href={rsvpPath(code)} />}
-            >
-              View or update RSVP
+      <RsvpMountFade delay={0.1} className="mx-auto max-w-lg px-6">
+        <RsvpDecorCard>
+          <CardHeader className="text-center">
+            <CardTitle>All set</CardTitle>
+            <CardDescription>
+              {code
+                ? `Confirmation saved for invitation ${code}.`
+                : "Your response is saved."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {code ? (
+              <Button
+                nativeButton={false}
+                variant="outline"
+                className="w-full"
+                render={<Link href={rsvpPath(code)} />}
+              >
+                View or update RSVP
+              </Button>
+            ) : null}
+            <Button nativeButton={false} className="w-full" render={<Link href="/" />}>
+              Back to wedding site
             </Button>
-          ) : null}
-          <Button nativeButton={false} className="w-full" render={<Link href="/" />}>
-            Back to wedding site
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </RsvpDecorCard>
+
+        <Text variant="caption" className="mt-6 block text-center text-muted-foreground">
+          With love, from our celebration in Tagaytay.
+        </Text>
+      </RsvpMountFade>
+    </>
   );
 }
 

@@ -4,15 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/typography";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Text } from "@/components/ui/typography";
+  RsvpDecorCard,
+} from "@/components/rsvp/rsvp-decor-card";
 import { RsvpLoading } from "@/components/rsvp/rsvp-loading";
+import { RsvpMountFade } from "@/components/rsvp/rsvp-mount-fade";
 import { RsvpPageHeader } from "@/components/rsvp/rsvp-page-header";
 import { RsvpStatusBadge } from "@/components/rsvp/rsvp-status-badge";
 import { useGuestCodeFromPath } from "@/hooks/useGuestCodeFromPath";
@@ -169,7 +170,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
 
   if (!guestCode) {
     return (
-      <>
+      <RsvpMountFade>
         <RsvpPageHeader
           title="Invitation not found"
           description="This link doesn't include a valid invitation code."
@@ -183,7 +184,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
             Enter invitation code
           </Button>
         </div>
-      </>
+      </RsvpMountFade>
     );
   }
 
@@ -193,7 +194,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
 
   if (loadError || !guest) {
     return (
-      <>
+      <RsvpMountFade>
         <RsvpPageHeader
           title="Invitation not found"
           description={loadError ?? "We couldn't find that invitation."}
@@ -211,7 +212,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
             Try again
           </Button>
         </div>
-      </>
+      </RsvpMountFade>
     );
   }
 
@@ -220,21 +221,23 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
 
   return (
     <>
-      <RsvpPageHeader
-        title={`Hello, ${firstName}`}
-        description={
-          alreadyResponded
-            ? "You can update your response below."
-            : "We would be honored to have you celebrate with us."
-        }
-      />
+      <RsvpMountFade>
+        <RsvpPageHeader
+          title={`Hello, ${firstName}`}
+          description={
+            alreadyResponded
+              ? "You can update your response below."
+              : "We would be honored to have you celebrate with us."
+          }
+        />
+      </RsvpMountFade>
 
-      <div className="mx-auto max-w-lg px-6">
-        <div className="mb-4 flex justify-center">
+      <RsvpMountFade delay={0.08} className="mx-auto max-w-lg px-6">
+        <div className="mb-5 flex justify-center">
           <RsvpStatusBadge status={guest.status} />
         </div>
 
-        <Card>
+        <RsvpDecorCard contentClassName="text-left">
           <CardHeader>
             <CardTitle>Your RSVP</CardTitle>
             <CardDescription>
@@ -383,8 +386,8 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
               </Text>
             </form>
           </CardContent>
-        </Card>
-      </div>
+        </RsvpDecorCard>
+      </RsvpMountFade>
     </>
   );
 }
