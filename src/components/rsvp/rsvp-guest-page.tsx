@@ -22,6 +22,7 @@ import {
   normalizeGuestCode,
   rsvpPath,
 } from "@/lib/guest-code";
+import { greetingName } from "@/lib/guest-name";
 import { getGuest, RsvpApiError, submitRsvp } from "@/lib/rsvp-api";
 import { cn } from "@/lib/utils";
 import type { Guest } from "@/types/rsvp-api";
@@ -167,7 +168,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
   }
 
   const alreadyResponded = guest.status !== "Pending";
-  const firstName = guest.name.split(" ")[0];
+  const firstName = greetingName(guest.name);
 
   return (
     <>
