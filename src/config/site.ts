@@ -33,12 +33,12 @@ export const siteConfig = {
     {
       question: "What is the dress code?",
       answer:
-        "Semi-formal attire is requested. Think elegant and comfortable — soft pastels and garden-friendly shoes are welcome.",
+        "Our only rule is that you wear wedding-appropriate attire. Guests can come in any color as long as no shorts, no slippers, no jeans and no white for ladies.",
     },
     {
-      question: "Are children welcome?",
+      question: "Can I bring a plus-one or my children?",
       answer:
-        "We love your little ones, but we've planned an adults-focused celebration. Nursing infants are warmly welcome.",
+        "The invitation will indicate if a plus-one or children are included. If you’re unsure, contact us. Please note that our wedding will be an adults-only event, except for children who are part of our entourage and immediate family.",
     },
     {
       question: "Is there parking available?",
