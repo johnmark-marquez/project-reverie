@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PaperTexture } from "@/components/effects/watercolor/paperTexture";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
@@ -56,13 +57,20 @@ export function SiteShell({ children }: SiteShellProps) {
         </nav>
       </header>
 
-      <main id="main-content">{children}</main>
+      <main id="main-content" className="relative bg-ivory">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-0"
+          style={{ opacity: 0.5 }}
+        >
+          <PaperTexture preset="cotton" />
+        </div>
+        <div className="relative z-[1]">{children}</div>
+      </main>
 
-      <footer className="border-t border-border/60 bg-ivory py-10">
+      <footer className="relative z-[1] border-t border-border/60 bg-ivory py-10">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <p className="font-heading text-lg text-ink">
-            {siteConfig.title}
-          </p>
+          <p className="font-heading text-lg text-ink">{siteConfig.title}</p>
           <p className="text-caption mt-2">
             February 10, 2028 · Made with love
           </p>

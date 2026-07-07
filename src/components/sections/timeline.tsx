@@ -1,5 +1,6 @@
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
+import { SectionBackdrop } from "@/components/layout/section-backdrop";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Heading, Text } from "@/components/ui/typography";
@@ -22,7 +23,12 @@ const events = [
 
 export function Timeline() {
   return (
-    <Section id="details" aria-labelledby="details-heading" className="bg-muted/30">
+    <Section
+      id="details"
+      aria-labelledby="details-heading"
+      className="relative overflow-hidden"
+    >
+      <SectionBackdrop tier="details" />
       <Container>
         <FadeIn>
           <Ribbon className="mb-8 w-16" />

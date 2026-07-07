@@ -1,5 +1,6 @@
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
+import { SectionBackdrop } from "@/components/layout/section-backdrop";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,12 @@ import { siteConfig } from "@/config/site";
 
 export function Rsvp() {
   return (
-    <Section id="rsvp" aria-labelledby="rsvp-heading" className="bg-muted/30">
+    <Section
+      id="rsvp"
+      aria-labelledby="rsvp-heading"
+      className="relative overflow-hidden"
+    >
+      <SectionBackdrop tier="minimal" />
       <Container size="sm">
         <FadeIn>
           <div className="text-center">

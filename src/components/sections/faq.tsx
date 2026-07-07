@@ -1,5 +1,6 @@
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
+import { SectionBackdrop } from "@/components/layout/section-backdrop";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Accordion } from "@/components/ui/accordion";
@@ -8,7 +9,12 @@ import { siteConfig } from "@/config/site";
 
 export function Faq() {
   return (
-    <Section id="faq" aria-labelledby="faq-heading">
+    <Section
+      id="faq"
+      aria-labelledby="faq-heading"
+      className="relative overflow-hidden"
+    >
+      <SectionBackdrop tier="minimal" />
       <Container size="sm">
         <FadeIn>
           <Ribbon className="mb-8 w-16" />

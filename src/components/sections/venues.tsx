@@ -1,6 +1,7 @@
 import { MapPin } from "lucide-react";
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
+import { SectionBackdrop } from "@/components/layout/section-backdrop";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,12 @@ const venues = [
 
 export function Venues() {
   return (
-    <Section id="venues" aria-labelledby="venues-heading">
+    <Section
+      id="venues"
+      aria-labelledby="venues-heading"
+      className="relative overflow-hidden"
+    >
+      <SectionBackdrop tier="details" />
       <Container>
         <FadeIn>
           <Ribbon className="mb-8 w-16" />

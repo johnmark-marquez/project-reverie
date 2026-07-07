@@ -1,6 +1,6 @@
 import { FadeIn } from "@/components/common/fade-in";
 import { Ribbon } from "@/components/common/ribbon";
-import { storyScene, WatercolorCanvas } from "@/components/effects/watercolor";
+import { SectionBackdrop } from "@/components/layout/section-backdrop";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Heading, Text } from "@/components/ui/typography";
@@ -12,10 +12,7 @@ export function OurStory() {
       aria-labelledby="story-heading"
       className="relative overflow-hidden"
     >
-      <WatercolorCanvas
-        scene={storyScene}
-        className="pointer-events-none absolute inset-0 -z-10 h-full"
-      />
+      <SectionBackdrop tier="story" />
 
       <Container>
         <FadeIn>
@@ -33,7 +30,8 @@ export function OurStory() {
             <div className="space-y-4">
               <Heading as="h3">How we met</Heading>
               <Text className="text-muted-foreground">
-                [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.]
+                [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua.]
               </Text>
             </div>
           </FadeIn>
@@ -42,14 +40,15 @@ export function OurStory() {
             <div className="space-y-4">
               <Heading as="h3">How we got engaged</Heading>
               <Text className="text-muted-foreground">
-                [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.]
+                [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua.]
               </Text>
             </div>
           </FadeIn>
         </div>
 
         <FadeIn delay={0.3} className="mt-12">
-          <div className="aspect-[16/9] rounded-2xl border border-border/60 bg-muted/50 flex items-center justify-center">
+          <div className="flex aspect-[16/9] items-center justify-center rounded-2xl border border-border/60 bg-card/60 backdrop-blur-sm">
             <Text variant="caption">Photo placeholder</Text>
           </div>
         </FadeIn>

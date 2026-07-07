@@ -153,6 +153,7 @@ export const heroScene: WatercolorScene = {
   ],
 };
 
+/** Light washes — story sections */
 export const storyScene: WatercolorScene = {
   id: "story",
   background: "ivory",
@@ -202,8 +203,47 @@ export const storyScene: WatercolorScene = {
   ],
 };
 
-/** Scene presets for future sections */
+/** Whisper washes — timeline & venues */
+export const detailsScene: WatercolorScene = {
+  id: "details",
+  background: "ivory",
+  texture: "cotton",
+  lighting: "afternoon",
+  motion: false,
+  washes: [
+    {
+      shape: "cloud",
+      color: "sage",
+      size: 340,
+      blur: 52,
+      opacity: 0.07,
+      composition: {
+        anchor: "top-left",
+        offset: { x: 5, y: 20 },
+        rotation: -8,
+        depth: 0,
+      },
+    },
+    {
+      shape: "wash",
+      color: "lavender",
+      size: 360,
+      blur: 55,
+      opacity: 0.06,
+      composition: {
+        anchor: "top-left",
+        offset: { x: 75, y: 60 },
+        rotation: 12,
+        depth: 1,
+      },
+    },
+  ],
+};
+
 export const scenePresets = {
   hero: heroScene,
   story: storyScene,
+  details: detailsScene,
 } as const;
+
+export type ScenePresetId = keyof typeof scenePresets;
