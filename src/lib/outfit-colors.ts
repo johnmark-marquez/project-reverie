@@ -13,7 +13,7 @@ interface ColorPizzaResponse {
   colors: ColorPizzaColor[];
 }
 
-const COLOR_PIZZA_URL = "https://api.color.pizza/v1/?list";
+const COLOR_PIZZA_URL = "https://api.color.pizza/v1/?list=x11";
 
 const EXCLUDED_NAME_PATTERN =
   /white|ivory|snow|ghost|linen|cream|beige|wheat|chiffon|lace|smoke|azure|mintcream|honeydew|seashell|cornsilk|floral|oldlace|antique|blanched|papaya|navajo|bisque|moccasin|peachpuff|mistyrose/i;
