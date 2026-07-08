@@ -23,6 +23,31 @@ function buildUrl(path: string) {
   return `${getApiUrl()}?path=${encodeURIComponent(path)}`;
 }
 
+async function readJson<T>(response: Response): Promise<T | ApiErrorBody> {
+  const text = await response.text();
+
+  try {
+    return JSON.parse(text) as T | ApiErrorBody;
+  } catch {
+    throw new RsvpApiError({
+      ok: false,
+      error: {
+        code: "INVALID_RESPONSE",
+        message: OUTDATED_SERVER_MESSAGE,
+      },
+    });
+  }
+}
+
+async function getJson<T>(path: string): Promise<T | ApiErrorBody> {
+  const response = await fetch(buildUrl(path), {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  return readJson<T>(response);
+}
+
 async function postJson<T>(path: string, body: unknown): Promise<T | ApiErrorBody> {
   const response = await fetch(buildUrl(path), {
     method: "POST",
@@ -31,16 +56,12 @@ async function postJson<T>(path: string, body: unknown): Promise<T | ApiErrorBod
     cache: "no-store",
   });
 
-  return (await response.json()) as T | ApiErrorBody;
+  return readJson<T>(response);
 }
 
 export async function getGuest(guestCode: string): Promise<Guest> {
   const normalized = guestCode.trim().toUpperCase();
-
-  // POST is more reliable than GET with Apps Script redirects
-  const data = await postJson<GetGuestResponse>("guest", {
-    guestCode: normalized,
-  });
+  const data = await getJson<GetGuestResponse>(`guest/${normalized}`);
 
   if (!data.ok) {
     throw new RsvpApiError(data);
@@ -76,9 +97,12 @@ export class RsvpApiError extends Error {
   }
 }
 
+const OUTDATED_SERVER_MESSAGE =
+  "The RSVP server is out of date. The site owner needs to redeploy the Apps Script (Deploy → Manage deployments → New version).";
+
 function formatApiErrorMessage(error: ApiErrorBody): string {
   if (error.error.code === "INVALID_PATH") {
-    return "The RSVP server is out of date. The site owner needs to redeploy the Apps Script (Deploy → Manage deployments → New version).";
+    return OUTDATED_SERVER_MESSAGE;
   }
 
   return error.error.message;

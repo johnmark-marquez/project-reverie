@@ -65,6 +65,19 @@ Project Reverie — Google Apps Script backend ↔ Next.js frontend.
    ```
 7. Optional script properties: `RSVP_DEADLINE`, `ALLOWED_ORIGIN`
 
+### Updating an existing deployment
+
+Saving `Code.gs` in the editor does **not** update the live web app. After each change:
+
+1. **Deploy → Manage deployments**
+2. Click the **pencil** on your Web app deployment
+3. Set **Version** to **New version**
+4. Click **Deploy** (keep the same `/exec` URL)
+
+Verify with `?path=ping` — the response should include `"apiVersion": 6` (or whatever `API_VERSION` is in `Code.gs`).
+
+If the site shows *"The RSVP server is out of date"*, the deployed script is behind the frontend — repeat the steps above and confirm the GitHub Actions secret `NEXT_PUBLIC_RSVP_API_URL` matches that `/exec` URL.
+
 **POST note:** Frontend sends `Content-Type: text/plain` to avoid CORS preflight with Apps Script.
 
 ---
