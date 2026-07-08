@@ -61,7 +61,7 @@ export function RsvpCodeForm({
           autoComplete="off"
           autoCapitalize="characters"
           spellCheck={false}
-          placeholder="RVR-4RBSN"
+          placeholder="XXX-XXXXX"
           value={code}
           onChange={(event) => {
             setCode(event.target.value);
