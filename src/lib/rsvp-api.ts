@@ -1,7 +1,9 @@
 import type {
   ApiErrorBody,
   GetGuestResponse,
+  GetOutfitColorsResponse,
   Guest,
+  OutfitColorAvailability,
   SubmitRsvpRequest,
   SubmitRsvpResponse,
 } from "@/types/rsvp-api";
@@ -62,6 +64,21 @@ async function postJson<T>(path: string, body: unknown): Promise<T | ApiErrorBod
 export async function getGuest(guestCode: string): Promise<Guest> {
   const normalized = guestCode.trim().toUpperCase();
   const data = await getJson<GetGuestResponse>(`guest/${normalized}`);
+
+  if (!data.ok) {
+    throw new RsvpApiError(data);
+  }
+
+  return data.data;
+}
+
+export async function getOutfitColorAvailability(
+  guestCode: string,
+): Promise<OutfitColorAvailability> {
+  const normalized = guestCode.trim().toUpperCase();
+  const data = await getJson<GetOutfitColorsResponse>(
+    `outfit-colors/${normalized}`,
+  );
 
   if (!data.ok) {
     throw new RsvpApiError(data);

@@ -36,6 +36,7 @@ Project Reverie — Google Apps Script backend ↔ Next.js frontend.
 | I | `lastUpdated` | ISO datetime | Last RSVP change |
 | J | `table` | string | Table number at reception (not written by API) |
 | K | `confirmedGuestNames` | string | Semicolon-separated names when attending (API writes) |
+| L | `outfitColor` | string | Hex color chosen for outfit (API writes when attending) |
 
 ### Sheet: `RSVP Log` (audit trail)
 
@@ -47,6 +48,7 @@ Project Reverie — Google Apps Script backend ↔ Next.js frontend.
 | D | `headcount` | number |
 | E | `guestNames` | string | Semicolon-separated when multi-guest |
 | F | `message` | string |
+| G | `outfitColor` | string | Hex color when attending |
 
 ---
 
@@ -74,7 +76,7 @@ Saving `Code.gs` in the editor does **not** update the live web app. After each 
 3. Set **Version** to **New version**
 4. Click **Deploy** (keep the same `/exec` URL)
 
-Verify with `?path=ping` — the response should include `"apiVersion": 6` (or whatever `API_VERSION` is in `Code.gs`).
+Verify with `?path=ping` — the response should include `"apiVersion": 7` (or whatever `API_VERSION` is in `Code.gs`).
 
 If the site shows *"The RSVP server is out of date"*, the deployed script is behind the frontend — repeat the steps above and confirm the GitHub Actions secret `NEXT_PUBLIC_RSVP_API_URL` matches that `/exec` URL.
 
@@ -113,7 +115,8 @@ GET {BASE_URL}/guest/JM001
     "seats": 2,
     "status": "Pending",
     "confirmedHeadcount": 0,
-    "lastUpdated": null
+    "lastUpdated": null,
+    "outfitColor": null
   }
 }
 ```
@@ -146,7 +149,27 @@ GET {BASE_URL}/guest/JM001
 
 ---
 
-### 2. Submit RSVP
+### 2. Get outfit color availability
+
+**`GET /outfit-colors/:guestCode`**
+
+Returns how many confirmed guests have already claimed each color. The frontend loads the palette from [Color Pizza](https://api.color.pizza/v1/?list=x11) and hides colors once two guests have chosen them.
+
+#### Response `200 OK`
+
+```json
+{
+  "ok": true,
+  "data": {
+    "selectedHex": "#4169e1",
+    "takenHexes": ["#ff0000", "#228b22"]
+  }
+}
+```
+
+---
+
+### 3. Submit RSVP
 
 **`POST /rsvp`**
 
@@ -164,6 +187,7 @@ Content-Type: application/json
   "guestCode": "RVR-MZGC5",
   "attending": true,
   "confirmedSeats": 1,
+  "outfitColor": "#4169e1",
   "message": "Can't wait!"
 }
 ```
@@ -174,6 +198,7 @@ Content-Type: application/json
 | `attending` | boolean | yes | `true` = accept, `false` = decline |
 | `confirmedSeats` | number | if attending | `1..seats` when attending; `0` when declining |
 | `guestNames` | string[] | if `seats >= 2` and attending | One name per attending guest |
+| `outfitColor` | string | if attending | Hex color (e.g. `#4169e1`); up to two guests may choose the same color |
 | `message` | string | no | Max 1000 chars |
 
 #### Response `200 OK`

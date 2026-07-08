@@ -24,7 +24,12 @@ import {
   rsvpPath,
 } from "@/lib/guest-code";
 import { greetingName } from "@/lib/guest-name";
-import { getGuest, RsvpApiError, submitRsvp } from "@/lib/rsvp-api";
+import { getGuest, getOutfitColorAvailability, RsvpApiError, submitRsvp } from "@/lib/rsvp-api";
+import type { OutfitColor } from "@/lib/outfit-colors";
+import {
+  loadOutfitColorCatalog,
+  RsvpOutfitColorPicker,
+} from "@/components/rsvp/rsvp-outfit-color-picker";
 import { cn } from "@/lib/utils";
 import type { Guest } from "@/types/rsvp-api";
 
@@ -48,6 +53,11 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
   const [confirmedSeats, setConfirmedSeats] = useState(1);
   const [guestNames, setGuestNames] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const [outfitColor, setOutfitColor] = useState<string | null>(null);
+  const [outfitColors, setOutfitColors] = useState<OutfitColor[]>([]);
+  const [takenOutfitHexes, setTakenOutfitHexes] = useState<string[]>([]);
+  const [outfitColorsLoading, setOutfitColorsLoading] = useState(false);
+  const [outfitColorsError, setOutfitColorsError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -87,6 +97,8 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
       } else if (data.status === "Declined") {
         setAttending(false);
       }
+
+      setOutfitColor(data.outfitColor ?? null);
     } catch (error) {
       if (error instanceof RsvpApiError) {
         setLoadError(error.message);
@@ -101,6 +113,44 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
   useEffect(() => {
     void loadGuest();
   }, [loadGuest]);
+
+  const loadOutfitColors = useCallback(async () => {
+    if (!isValidGuestCode(normalizedCode)) {
+      return;
+    }
+
+    setOutfitColorsLoading(true);
+    setOutfitColorsError(null);
+
+    try {
+      const [catalog, availability] = await Promise.all([
+        loadOutfitColorCatalog(),
+        getOutfitColorAvailability(normalizedCode),
+      ]);
+
+      setOutfitColors(catalog);
+      setTakenOutfitHexes(availability.takenHexes);
+    } catch (error) {
+      if (error instanceof RsvpApiError) {
+        setOutfitColorsError(error.message);
+      } else {
+        setOutfitColorsError("Could not load outfit colors. Please try again.");
+      }
+    } finally {
+      setOutfitColorsLoading(false);
+    }
+  }, [normalizedCode]);
+
+  useEffect(() => {
+    if (attending === true) {
+      void loadOutfitColors();
+      return;
+    }
+
+    if (attending === false) {
+      setOutfitColor(null);
+    }
+  }, [attending, loadOutfitColors]);
 
   useEffect(() => {
     if (!guest || attending !== true || guest.seats < 2) {
@@ -138,6 +188,11 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
       }
     }
 
+    if (attending && !outfitColor) {
+      setSubmitError("Please choose an outfit color.");
+      return;
+    }
+
     setSubmitting(true);
     setSubmitError(null);
 
@@ -151,6 +206,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
             ? guestNames.map((name) => name.trim()).slice(0, confirmedSeats)
             : undefined,
         message: message.trim() || undefined,
+        outfitColor: attending ? outfitColor ?? undefined : undefined,
       });
 
       const params = new URLSearchParams({
@@ -161,6 +217,10 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
     } catch (error) {
       if (error instanceof RsvpApiError) {
         setSubmitError(error.message);
+
+        if (error.code === "OUTFIT_COLOR_TAKEN") {
+          void loadOutfitColors();
+        }
       } else {
         setSubmitError("We couldn't save your RSVP. Please try again.");
       }
@@ -351,6 +411,17 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
                     </div>
                   ))}
                 </fieldset>
+              ) : null}
+
+              {attending ? (
+                <RsvpOutfitColorPicker
+                  colors={outfitColors}
+                  takenHexes={takenOutfitHexes}
+                  value={outfitColor}
+                  onChange={setOutfitColor}
+                  loading={outfitColorsLoading}
+                  error={outfitColorsError}
+                />
               ) : null}
 
               <div className="space-y-2">

@@ -69,6 +69,7 @@ export const siteConfig = {
       "Will you be attending?",
       "Number of guests attending",
       "Guest name(s) for those with more than 1 guest",
+      "Outfit color (each color can be chosen by up to two guests)",
       "Message for the couple",
     ],
   },

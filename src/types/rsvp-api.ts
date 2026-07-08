@@ -8,6 +8,17 @@ export interface Guest {
   confirmedHeadcount: number;
   lastUpdated: string | null;
   confirmedGuestNames?: string[];
+  outfitColor?: string | null;
+}
+
+export interface OutfitColorAvailability {
+  selectedHex: string | null;
+  takenHexes: string[];
+}
+
+export interface GetOutfitColorsResponse {
+  ok: true;
+  data: OutfitColorAvailability;
 }
 
 export interface GetGuestResponse {
@@ -21,6 +32,7 @@ export interface SubmitRsvpRequest {
   confirmedSeats: number;
   guestNames?: string[];
   message?: string;
+  outfitColor?: string;
 }
 
 export interface SubmitRsvpResult {

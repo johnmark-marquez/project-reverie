@@ -17,7 +17,7 @@
 const GUEST_LIST_SHEET = "Guest List";
 const RSVP_LOG_SHEET = "RSVP Log";
 /** Bump when redeploying — verify at {WEB_APP_URL}?path=ping */
-const API_VERSION = 6;
+const API_VERSION = 7;
 const GUEST_CODE_PATTERN = /^([A-Z0-9]{2,6}-[A-Z0-9]{4,10}|[A-Z]{2}\d{3})$/;
 
 /** Guest List columns (0-based). RSVP writes only rsvpStatus, confirmedHeadcount, lastUpdated. */
@@ -33,6 +33,7 @@ confirmedHeadcount: 7,
 lastUpdated: 8,
 table: 9,
 confirmedGuestNames: 10,
+outfitColor: 11,
 };
 
 function doGet(e) {
@@ -41,6 +42,13 @@ try {
 
   if (path === "ping") {
     return jsonOk({ apiVersion: API_VERSION, status: "ok" });
+  }
+
+  const outfitColorsMatch = path.match(/^outfit-colors\/(.+)$/i);
+
+  if (outfitColorsMatch) {
+  const guestCode = decodeGuestCodeSegment(outfitColorsMatch[1]);
+  return outfitColorsResponse(guestCode);
   }
 
   const guestCode = resolveGuestCodeFromGet(e);
@@ -115,6 +123,18 @@ try {
     return guestNames.error;
   }
 
+  let outfitColor = "";
+
+  if (attending) {
+    const outfitColorResult = parseSubmittedOutfitColor(body, guest);
+
+    if (outfitColorResult.error) {
+      return outfitColorResult.error;
+    }
+
+    outfitColor = outfitColorResult.value;
+  }
+
   const status = attending ? "Confirmed" : "Declined";
   const response = attending ? "Accepted" : "Declined";
   const now = new Date().toISOString();
@@ -124,6 +144,7 @@ try {
     confirmedHeadcount: attending ? confirmedSeats : 0,
     lastUpdated: now,
     confirmedGuestNames: attending && guest.seats >= 2 ? formatGuestNames(guestNames) : "",
+    outfitColor: outfitColor,
   });
 
   appendRsvpLog({
@@ -133,6 +154,7 @@ try {
     headcount: attending ? confirmedSeats : 0,
     guestNames: attending && guest.seats >= 2 ? formatGuestNames(guestNames) : "",
     message: message,
+    outfitColor: outfitColor,
   });
 
   return jsonOk({
@@ -210,6 +232,28 @@ return jsonOk({
   confirmedHeadcount: guest.confirmedHeadcount,
   lastUpdated: guest.lastUpdated,
   confirmedGuestNames: guest.confirmedGuestNames,
+  outfitColor: guest.outfitColor,
+});
+}
+
+function outfitColorsResponse(guestCode) {
+if (!GUEST_CODE_PATTERN.test(guestCode)) {
+  return jsonError(400, "INVALID_GUEST_CODE", "Invalid invitation code format.");
+}
+
+const guest = findGuest(guestCode);
+
+if (!guest) {
+  return jsonError(
+    404,
+    "GUEST_NOT_FOUND",
+    "We couldn't find that invitation code. Please check your invite or contact us.",
+  );
+}
+
+return jsonOk({
+  selectedHex: guest.outfitColor || null,
+  takenHexes: getTakenOutfitColors(guest.guestCode),
 });
 }
 
@@ -255,6 +299,7 @@ for (let i = 1; i < values.length; i++) {
         ? new Date(row[COL.lastUpdated]).toISOString()
         : null,
       confirmedGuestNames: parseGuestNames(row[COL.confirmedGuestNames]),
+      outfitColor: normalizeOutfitColor(row[COL.outfitColor]),
     };
   }
 }
@@ -272,6 +317,97 @@ sheet.getRange(rowIndex, COL.lastUpdated + 1).setValue(update.lastUpdated);
 if (update.confirmedGuestNames !== undefined) {
   sheet.getRange(rowIndex, COL.confirmedGuestNames + 1).setValue(update.confirmedGuestNames);
 }
+
+if (update.outfitColor !== undefined) {
+  sheet.getRange(rowIndex, COL.outfitColor + 1).setValue(update.outfitColor);
+}
+}
+
+function getTakenOutfitColors(excludeGuestCode) {
+const sheet = getSheet(GUEST_LIST_SHEET);
+const values = sheet.getDataRange().getValues();
+const taken = [];
+
+for (let i = 1; i < values.length; i++) {
+  const row = values[i];
+  const code = String(row[COL.guestCode] || "").trim().toUpperCase();
+  const status = normalizeStatus(row[COL.rsvpStatus]);
+  const color = normalizeOutfitColor(row[COL.outfitColor]);
+
+  if (code === excludeGuestCode || status !== "Confirmed" || !color) {
+    continue;
+  }
+
+  taken.push(color);
+}
+
+return taken;
+}
+
+function countOutfitColorClaims(takenHexes, outfitColor) {
+var count = 0;
+
+for (var i = 0; i < takenHexes.length; i++) {
+  if (takenHexes[i] === outfitColor) {
+    count++;
+  }
+}
+
+return count;
+}
+
+function normalizeOutfitColor(value) {
+const raw = String(value || "").trim();
+
+if (!raw) {
+  return "";
+}
+
+const match = raw.match(/^#?([0-9a-f]{6})$/i);
+
+if (!match) {
+  return raw.toLowerCase();
+}
+
+return "#" + match[1].toLowerCase();
+}
+
+function parseSubmittedOutfitColor(body, guest) {
+const raw = String(body.outfitColor || "").trim();
+
+if (!raw) {
+  return {
+    error: jsonError(
+      400,
+      "INVALID_PAYLOAD",
+      "Please choose an outfit color when attending.",
+    ),
+  };
+}
+
+const outfitColor = normalizeOutfitColor(raw);
+const taken = getTakenOutfitColors(guest.guestCode);
+const claimCount = countOutfitColorClaims(taken, outfitColor);
+
+if (claimCount >= 2) {
+  return {
+    error: jsonError(
+      409,
+      "OUTFIT_COLOR_TAKEN",
+      "That color has already been chosen by two guests. Please pick a different one.",
+    ),
+  };
+}
+
+return { value: outfitColor };
+}
+
+function decodeGuestCodeSegment(segment) {
+try {
+  return decodeURIComponent(segment).trim().toUpperCase();
+} catch (err) {
+  return String(segment).trim().toUpperCase();
+}
 }
 
 function appendRsvpLog(entry) {
@@ -284,6 +420,7 @@ sheet.appendRow([
   entry.headcount,
   entry.guestNames,
   entry.message,
+  entry.outfitColor || "",
 ]);
 }
 
