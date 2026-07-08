@@ -27,6 +27,10 @@ import { greetingName } from "@/lib/guest-name";
 import { getGuest, getOutfitColorAvailability, RsvpApiError, submitRsvp } from "@/lib/rsvp-api";
 import type { OutfitColor } from "@/lib/outfit-colors";
 import {
+  findOutfitColorHex,
+  findOutfitColorName,
+} from "@/lib/outfit-colors";
+import {
   loadOutfitColorCatalog,
   RsvpOutfitColorPicker,
 } from "@/components/rsvp/rsvp-outfit-color-picker";
@@ -53,9 +57,9 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
   const [confirmedSeats, setConfirmedSeats] = useState(1);
   const [guestNames, setGuestNames] = useState<string[]>([]);
   const [message, setMessage] = useState("");
-  const [outfitColor, setOutfitColor] = useState<string | null>(null);
+  const [outfitColorHex, setOutfitColorHex] = useState<string | null>(null);
   const [outfitColors, setOutfitColors] = useState<OutfitColor[]>([]);
-  const [takenOutfitHexes, setTakenOutfitHexes] = useState<string[]>([]);
+  const [takenOutfitNames, setTakenOutfitNames] = useState<string[]>([]);
   const [outfitColorsLoading, setOutfitColorsLoading] = useState(false);
   const [outfitColorsError, setOutfitColorsError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -97,8 +101,6 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
       } else if (data.status === "Declined") {
         setAttending(false);
       }
-
-      setOutfitColor(data.outfitColor ?? null);
     } catch (error) {
       if (error instanceof RsvpApiError) {
         setLoadError(error.message);
@@ -129,7 +131,13 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
       ]);
 
       setOutfitColors(catalog);
-      setTakenOutfitHexes(availability.takenHexes);
+      setTakenOutfitNames(availability.takenNames);
+
+      const savedName = guest?.outfitColor ?? availability.selectedName;
+      const hex = findOutfitColorHex(catalog, savedName);
+      if (hex) {
+        setOutfitColorHex(hex);
+      }
     } catch (error) {
       if (error instanceof RsvpApiError) {
         setOutfitColorsError(error.message);
@@ -139,7 +147,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
     } finally {
       setOutfitColorsLoading(false);
     }
-  }, [normalizedCode]);
+  }, [normalizedCode, guest?.outfitColor]);
 
   useEffect(() => {
     if (attending === true) {
@@ -148,7 +156,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
     }
 
     if (attending === false) {
-      setOutfitColor(null);
+      setOutfitColorHex(null);
     }
   }, [attending, loadOutfitColors]);
 
@@ -188,7 +196,17 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
       }
     }
 
-    if (attending && !outfitColor) {
+    if (attending && !outfitColorHex) {
+      setSubmitError("Please choose an outfit color.");
+      return;
+    }
+
+    const outfitColorName =
+      attending && outfitColorHex
+        ? findOutfitColorName(outfitColors, outfitColorHex)
+        : null;
+
+    if (attending && !outfitColorName) {
       setSubmitError("Please choose an outfit color.");
       return;
     }
@@ -206,7 +224,7 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
             ? guestNames.map((name) => name.trim()).slice(0, confirmedSeats)
             : undefined,
         message: message.trim() || undefined,
-        outfitColor: attending ? outfitColor ?? undefined : undefined,
+        outfitColor: attending ? outfitColorName ?? undefined : undefined,
       });
 
       const params = new URLSearchParams({
@@ -416,9 +434,9 @@ export function RsvpGuestPage({ fallbackCode }: RsvpGuestPageProps) {
               {attending ? (
                 <RsvpOutfitColorPicker
                   colors={outfitColors}
-                  takenHexes={takenOutfitHexes}
-                  value={outfitColor}
-                  onChange={setOutfitColor}
+                  takenNames={takenOutfitNames}
+                  value={outfitColorHex}
+                  onChange={setOutfitColorHex}
                   loading={outfitColorsLoading}
                   error={outfitColorsError}
                 />

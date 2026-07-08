@@ -17,7 +17,7 @@
 const GUEST_LIST_SHEET = "Guest List";
 const RSVP_LOG_SHEET = "RSVP Log";
 /** Bump when redeploying — verify at {WEB_APP_URL}?path=ping */
-const API_VERSION = 7;
+const API_VERSION = 8;
 const GUEST_CODE_PATTERN = /^([A-Z0-9]{2,6}-[A-Z0-9]{4,10}|[A-Z]{2}\d{3})$/;
 
 /** Guest List columns (0-based). RSVP writes only rsvpStatus, confirmedHeadcount, lastUpdated. */
@@ -252,8 +252,8 @@ if (!guest) {
 }
 
 return jsonOk({
-  selectedHex: guest.outfitColor || null,
-  takenHexes: getTakenOutfitColors(guest.guestCode),
+  selectedName: guest.outfitColor || null,
+  takenNames: getTakenOutfitColors(guest.guestCode),
 });
 }
 
@@ -299,7 +299,7 @@ for (let i = 1; i < values.length; i++) {
         ? new Date(row[COL.lastUpdated]).toISOString()
         : null,
       confirmedGuestNames: parseGuestNames(row[COL.confirmedGuestNames]),
-      outfitColor: normalizeOutfitColor(row[COL.outfitColor]),
+      outfitColor: normalizeOutfitColorName(row[COL.outfitColor]),
     };
   }
 }
@@ -332,7 +332,7 @@ for (let i = 1; i < values.length; i++) {
   const row = values[i];
   const code = String(row[COL.guestCode] || "").trim().toUpperCase();
   const status = normalizeStatus(row[COL.rsvpStatus]);
-  const color = normalizeOutfitColor(row[COL.outfitColor]);
+  const color = normalizeOutfitColorName(row[COL.outfitColor]);
 
   if (code === excludeGuestCode || status !== "Confirmed" || !color) {
     continue;
@@ -344,11 +344,12 @@ for (let i = 1; i < values.length; i++) {
 return taken;
 }
 
-function countOutfitColorClaims(takenHexes, outfitColor) {
+function countOutfitColorClaims(takenNames, outfitColorName) {
+var key = normalizeOutfitColorKey(outfitColorName);
 var count = 0;
 
-for (var i = 0; i < takenHexes.length; i++) {
-  if (takenHexes[i] === outfitColor) {
+for (var i = 0; i < takenNames.length; i++) {
+  if (normalizeOutfitColorKey(takenNames[i]) === key) {
     count++;
   }
 }
@@ -356,20 +357,12 @@ for (var i = 0; i < takenHexes.length; i++) {
 return count;
 }
 
-function normalizeOutfitColor(value) {
-const raw = String(value || "").trim();
-
-if (!raw) {
-  return "";
+function normalizeOutfitColorName(value) {
+return truncate(String(value || "").trim(), 100);
 }
 
-const match = raw.match(/^#?([0-9a-f]{6})$/i);
-
-if (!match) {
-  return raw.toLowerCase();
-}
-
-return "#" + match[1].toLowerCase();
+function normalizeOutfitColorKey(value) {
+return String(value || "").trim().toLowerCase();
 }
 
 function parseSubmittedOutfitColor(body, guest) {
@@ -385,9 +378,9 @@ if (!raw) {
   };
 }
 
-const outfitColor = normalizeOutfitColor(raw);
+const outfitColorName = normalizeOutfitColorName(raw);
 const taken = getTakenOutfitColors(guest.guestCode);
-const claimCount = countOutfitColorClaims(taken, outfitColor);
+const claimCount = countOutfitColorClaims(taken, outfitColorName);
 
 if (claimCount >= 2) {
   return {
@@ -399,7 +392,7 @@ if (claimCount >= 2) {
   };
 }
 
-return { value: outfitColor };
+return { value: outfitColorName };
 }
 
 function decodeGuestCodeSegment(segment) {

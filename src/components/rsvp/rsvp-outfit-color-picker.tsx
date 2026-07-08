@@ -8,7 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface RsvpOutfitColorPickerProps {
-  takenHexes: string[];
+  takenNames: string[];
   value: string | null;
   onChange: (hex: string) => void;
   colors: OutfitColor[];
@@ -17,14 +17,14 @@ interface RsvpOutfitColorPickerProps {
 }
 
 export function RsvpOutfitColorPicker({
-  takenHexes,
+  takenNames,
   value,
   onChange,
   colors,
   loading = false,
   error = null,
 }: RsvpOutfitColorPickerProps) {
-  const availableColors = filterAvailableOutfitColors(colors, takenHexes, value);
+  const availableColors = filterAvailableOutfitColors(colors, takenNames, value);
 
   if (loading) {
     return (

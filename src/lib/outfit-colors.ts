@@ -15,8 +15,8 @@ interface ColorPizzaResponse {
 
 const COLOR_PIZZA_URL = "https://api.color.pizza/v1/?list=x11";
 
-const EXCLUDED_NAME_PATTERN =
-  /white|ivory|snow|ghost|linen|cream|beige|wheat|chiffon|lace|smoke|azure|mintcream|honeydew|seashell|cornsilk|floral|oldlace|antique|blanched|papaya|navajo|bisque|moccasin|peachpuff|mistyrose/i;
+const EXCLUDED_NAME_PATTERN = /white | ivory | snow | ghost | linen /i
+  // /white|ivory|snow|ghost|linen|cream|beige|wheat|chiffon|lace|smoke|azure|mintcream|honeydew|seashell|cornsilk|floral|oldlace|antique|blanched|papaya|navajo|bisque|moccasin|peachpuff|mistyrose/i;
 
 /** Dress code: no white for ladies — drop very light neutrals from the picker. */
 function isExcludedColor(color: ColorPizzaColor): boolean {
@@ -70,17 +70,60 @@ export async function fetchOutfitColorCatalog(): Promise<OutfitColor[]> {
   return colors.sort((left, right) => left.name.localeCompare(right.name));
 }
 
+export function findOutfitColorHex(
+  catalog: OutfitColor[],
+  saved: string | null | undefined,
+): string | null {
+  if (!saved?.trim()) {
+    return null;
+  }
+
+  const trimmed = saved.trim();
+  const byName = catalog.find(
+    (color) => color.name.toLowerCase() === trimmed.toLowerCase(),
+  );
+
+  if (byName) {
+    return byName.hex;
+  }
+
+  const normalizedSaved = normalizeHex(trimmed);
+  const byHex = catalog.find(
+    (color) => normalizeHex(color.hex) === normalizedSaved,
+  );
+
+  return byHex?.hex ?? null;
+}
+
+export function findOutfitColorName(
+  catalog: OutfitColor[],
+  hex: string | null | undefined,
+): string | null {
+  if (!hex?.trim()) {
+    return null;
+  }
+
+  const normalized = normalizeHex(hex);
+  return (
+    catalog.find((color) => normalizeHex(color.hex) === normalized)?.name ??
+    null
+  );
+}
+
 export const MAX_OUTFIT_COLOR_CLAIMS = 2;
 
 export function filterAvailableOutfitColors(
   catalog: OutfitColor[],
-  takenHexes: string[],
+  takenNames: string[],
   selectedHex?: string | null,
 ): OutfitColor[] {
   const takenCounts = new Map<string, number>();
 
-  for (const hex of takenHexes) {
-    const key = normalizeHex(hex);
+  for (const name of takenNames) {
+    const key = name.trim().toLowerCase();
+    if (!key) {
+      continue;
+    }
     takenCounts.set(key, (takenCounts.get(key) ?? 0) + 1);
   }
 
@@ -88,7 +131,7 @@ export function filterAvailableOutfitColors(
 
   return catalog.filter((color) => {
     const hex = normalizeHex(color.hex);
-    const claimCount = takenCounts.get(hex) ?? 0;
+    const claimCount = takenCounts.get(color.name.toLowerCase()) ?? 0;
     return hex === selected || claimCount < MAX_OUTFIT_COLOR_CLAIMS;
   });
 }

@@ -12,8 +12,8 @@ export interface Guest {
 }
 
 export interface OutfitColorAvailability {
-  selectedHex: string | null;
-  takenHexes: string[];
+  selectedName: string | null;
+  takenNames: string[];
 }
 
 export interface GetOutfitColorsResponse {
