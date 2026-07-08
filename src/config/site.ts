@@ -60,7 +60,7 @@ export const siteConfig = {
   },
 
   rsvp: {
-    deadline: "January 10, 2028",
+    deadline: "November 10, 2027",
     message:
       "We can't wait to celebrate with you. Use the invitation code on your invite to RSVP — it only takes a minute.",
     buttonLabel: "RSVP with invitation code",
@@ -106,7 +106,19 @@ export const siteConfig = {
     {
       question: "Do you have a gift registry?",
       answer:
-        "Your presence is the greatest gift. If you wish to give something more, a contribution to our honeymoon fund would be deeply appreciated.",
+        "Your presence is the greatest gift. If you wish to give something more, a contribution to our honeymoon fund would be deeply appreciated. You may scan either QR code below.",
+      qrCodes: [
+        {
+          name: "John Mark Marquez",
+          image: "/gifts/john-mark-unionbank-qr.png",
+          imageAlt: "UnionBank QR code for John Mark Marquez",
+        },
+        {
+          name: "Sandra Pizarras Honorio",
+          image: "/gifts/sandra-unionbank-qr.png",
+          imageAlt: "UnionBank QR code for Sandra Pizarras Honorio",
+        },
+      ],
     },
   ],
 

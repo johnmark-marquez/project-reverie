@@ -1,18 +1,27 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface FaqQrCode {
+  name: string;
+  image: string;
+  imageAlt: string;
+}
+
 interface AccordionItemProps {
   question: string;
   answer: string;
+  qrCodes?: readonly FaqQrCode[];
   defaultOpen?: boolean;
 }
 
 export function AccordionItem({
   question,
   answer,
+  qrCodes,
   defaultOpen = false,
 }: AccordionItemProps) {
   const [open, setOpen] = useState(defaultOpen);
@@ -42,6 +51,29 @@ export function AccordionItem({
       >
         <div className="overflow-hidden">
           <p className="text-body text-muted-foreground">{answer}</p>
+          {qrCodes && qrCodes.length > 0 ? (
+            <div className="mt-6 grid gap-6 sm:grid-cols-2">
+              {qrCodes.map((qr) => (
+                <figure
+                  key={qr.name}
+                  className="flex flex-col items-center rounded-lg border border-border/60 bg-background/60 p-4"
+                >
+                  <div className="relative aspect-square w-full max-w-[220px]">
+                    <Image
+                      src={qr.image}
+                      alt={qr.imageAlt}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 220px"
+                      className="object-contain"
+                    />
+                  </div>
+                  <figcaption className="mt-3 text-center text-sm text-foreground">
+                    {qr.name}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -49,7 +81,11 @@ export function AccordionItem({
 }
 
 interface AccordionProps {
-  items: { question: string; answer: string }[];
+  items: {
+    question: string;
+    answer: string;
+    qrCodes?: readonly FaqQrCode[];
+  }[];
 }
 
 export function Accordion({ items }: AccordionProps) {
@@ -60,6 +96,7 @@ export function Accordion({ items }: AccordionProps) {
           key={item.question}
           question={item.question}
           answer={item.answer}
+          qrCodes={item.qrCodes}
           defaultOpen={index === 0}
         />
       ))}
